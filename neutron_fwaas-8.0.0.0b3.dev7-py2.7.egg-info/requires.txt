@@ -1,0 +1,14 @@
+pbr>=1.6
+eventlet!=0.18.0,>=0.17.4
+httplib2>=0.7.5
+netaddr!=0.7.16,>=0.7.12
+SQLAlchemy<1.1.0,>=1.0.10
+alembic>=0.8.0
+six>=1.9.0
+oslo.config>=3.4.0
+oslo.db>=4.1.0
+oslo.log>=1.14.0
+oslo.messaging>=4.0.0
+oslo.serialization>=1.10.0
+oslo.service>=1.0.0
+oslo.utils>=3.4.0

@@ -1,0 +1,121 @@
+[console_scripts]
+neutron-db-manage = neutron.db.migration.cli:main
+neutron-debug = neutron.debug.shell:main
+neutron-dhcp-agent = neutron.cmd.eventlet.agents.dhcp:main
+neutron-ipset-cleanup = neutron.cmd.ipset_cleanup:main
+neutron-keepalived-state-change = neutron.cmd.keepalived_state_change:main
+neutron-l3-agent = neutron.cmd.eventlet.agents.l3:main
+neutron-linuxbridge-agent = neutron.cmd.eventlet.plugins.linuxbridge_neutron_agent:main
+neutron-linuxbridge-cleanup = neutron.cmd.linuxbridge_cleanup:main
+neutron-metadata-agent = neutron.cmd.eventlet.agents.metadata:main
+neutron-metering-agent = neutron.cmd.eventlet.services.metering_agent:main
+neutron-netns-cleanup = neutron.cmd.netns_cleanup:main
+neutron-ns-metadata-proxy = neutron.cmd.eventlet.agents.metadata_proxy:main
+neutron-openvswitch-agent = neutron.cmd.eventlet.plugins.ovs_neutron_agent:main
+neutron-ovs-cleanup = neutron.cmd.ovs_cleanup:main
+neutron-pd-notify = neutron.cmd.pd_notify:main
+neutron-rootwrap = oslo_rootwrap.cmd:main
+neutron-rootwrap-daemon = oslo_rootwrap.cmd:daemon
+neutron-rpc-server = neutron.cmd.eventlet.server:main_rpc_eventlet
+neutron-sanity-check = neutron.cmd.sanity_check:main
+neutron-server = neutron.cmd.eventlet.server:main
+neutron-sriov-nic-agent = neutron.cmd.eventlet.plugins.sriov_nic_neutron_agent:main
+neutron-usage-audit = neutron.cmd.eventlet.usage_audit:main
+
+[neutron.agent.l2.extensions]
+qos = neutron.agent.l2.extensions.qos:QosAgentExtension
+
+[neutron.agent.linux.pd_drivers]
+dibbler = neutron.agent.linux.dibbler:PDDibbler
+
+[neutron.core_plugins]
+ml2 = neutron.plugins.ml2.plugin:Ml2Plugin
+
+[neutron.db.alembic_migrations]
+neutron = neutron.db.migration:alembic_migrations
+
+[neutron.interface_drivers]
+ivs = neutron.agent.linux.interface:IVSInterfaceDriver
+linuxbridge = neutron.agent.linux.interface:BridgeInterfaceDriver
+null = neutron.agent.linux.interface:NullDriver
+openvswitch = neutron.agent.linux.interface:OVSInterfaceDriver
+
+[neutron.ipam_drivers]
+fake = neutron.tests.unit.ipam.fake_driver:FakeDriver
+internal = neutron.ipam.drivers.neutrondb_ipam.driver:NeutronDbPool
+
+[neutron.ml2.extension_drivers]
+dns = neutron.plugins.ml2.extensions.dns_integration:DNSExtensionDriverML2
+port_security = neutron.plugins.ml2.extensions.port_security:PortSecurityExtensionDriver
+qos = neutron.plugins.ml2.extensions.qos:QosExtensionDriver
+test = neutron.tests.unit.plugins.ml2.drivers.ext_test:TestExtensionDriver
+testdb = neutron.tests.unit.plugins.ml2.drivers.ext_test:TestDBExtensionDriver
+
+[neutron.ml2.mechanism_drivers]
+fake_agent = neutron.tests.unit.plugins.ml2.drivers.mech_fake_agent:FakeAgentMechanismDriver
+l2population = neutron.plugins.ml2.drivers.l2pop.mech_driver:L2populationMechanismDriver
+linuxbridge = neutron.plugins.ml2.drivers.linuxbridge.mech_driver.mech_linuxbridge:LinuxbridgeMechanismDriver
+logger = neutron.tests.unit.plugins.ml2.drivers.mechanism_logger:LoggerMechanismDriver
+openvswitch = neutron.plugins.ml2.drivers.openvswitch.mech_driver.mech_openvswitch:OpenvswitchMechanismDriver
+sriovnicswitch = neutron.plugins.ml2.drivers.mech_sriov.mech_driver.mech_driver:SriovNicSwitchMechanismDriver
+test = neutron.tests.unit.plugins.ml2.drivers.mechanism_test:TestMechanismDriver
+
+[neutron.ml2.type_drivers]
+flat = neutron.plugins.ml2.drivers.type_flat:FlatTypeDriver
+geneve = neutron.plugins.ml2.drivers.type_geneve:GeneveTypeDriver
+gre = neutron.plugins.ml2.drivers.type_gre:GreTypeDriver
+local = neutron.plugins.ml2.drivers.type_local:LocalTypeDriver
+vlan = neutron.plugins.ml2.drivers.type_vlan:VlanTypeDriver
+vxlan = neutron.plugins.ml2.drivers.type_vxlan:VxlanTypeDriver
+
+[neutron.openstack.common.cache.backends]
+memory = neutron.openstack.common.cache._backends.memory:MemoryBackend
+
+[neutron.qos.agent_drivers]
+ovs = neutron.plugins.ml2.drivers.openvswitch.agent.extension_drivers.qos_driver:QosOVSAgentDriver
+sriov = neutron.plugins.ml2.drivers.mech_sriov.agent.extension_drivers.qos_driver:QosSRIOVAgentDriver
+
+[neutron.qos.notification_drivers]
+message_queue = neutron.services.qos.notification_drivers.message_queue:RpcQosServiceNotificationDriver
+
+[neutron.service_plugins]
+dummy = neutron.tests.unit.dummy_plugin:DummyServicePlugin
+firewall = neutron_fwaas.services.firewall.fwaas_plugin:FirewallPlugin
+flavors = neutron.services.flavors.flavors_plugin:FlavorsPlugin
+lbaas = neutron_lbaas.services.loadbalancer.plugin:LoadBalancerPlugin
+metering = neutron.services.metering.metering_plugin:MeteringPlugin
+neutron.services.firewall.fwaas_plugin.FirewallPlugin = neutron_fwaas.services.firewall.fwaas_plugin:FirewallPlugin
+neutron.services.loadbalancer.plugin.LoadBalancerPlugin = neutron_lbaas.services.loadbalancer.plugin:LoadBalancerPlugin
+neutron.services.vpn.plugin.VPNDriverPlugin = neutron_vpnaas.services.vpn.plugin:VPNDriverPlugin
+qos = neutron.services.qos.qos_plugin:QoSPlugin
+router = neutron.services.l3_router.l3_router_plugin:L3RouterPlugin
+vpnaas = neutron_vpnaas.services.vpn.plugin:VPNDriverPlugin
+
+[neutron.services.external_dns_drivers]
+designate = neutron.services.externaldns.drivers.designate.driver:Designate
+
+[oslo.config.opts]
+neutron = neutron.opts:list_opts
+neutron.agent = neutron.opts:list_agent_opts
+neutron.base.agent = neutron.opts:list_base_agent_opts
+neutron.db = neutron.opts:list_db_opts
+neutron.dhcp.agent = neutron.opts:list_dhcp_agent_opts
+neutron.extensions = neutron.opts:list_extension_opts
+neutron.l3.agent = neutron.opts:list_l3_agent_opts
+neutron.metadata.agent = neutron.opts:list_metadata_agent_opts
+neutron.metering.agent = neutron.opts:list_metering_agent_opts
+neutron.ml2 = neutron.opts:list_ml2_conf_opts
+neutron.ml2.linuxbridge.agent = neutron.opts:list_linux_bridge_opts
+neutron.ml2.ovs.agent = neutron.opts:list_ovs_opts
+neutron.ml2.sriov = neutron.opts:list_ml2_conf_sriov_opts
+neutron.ml2.sriov.agent = neutron.opts:list_sriov_agent_opts
+neutron.qos = neutron.opts:list_qos_opts
+nova.auth = neutron.opts:list_auth_opts
+
+[oslo.messaging.notify.drivers]
+neutron.openstack.common.notifier.log_notifier = oslo_messaging.notify._impl_log:LogDriver
+neutron.openstack.common.notifier.no_op_notifier = oslo_messaging.notify._impl_noop:NoOpDriver
+neutron.openstack.common.notifier.rpc_notifier = oslo_messaging.notify.messaging:MessagingDriver
+neutron.openstack.common.notifier.rpc_notifier2 = oslo_messaging.notify.messaging:MessagingV2Driver
+neutron.openstack.common.notifier.test_notifier = oslo_messaging.notify._impl_test:TestDriver
+

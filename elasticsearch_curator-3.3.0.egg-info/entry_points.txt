@@ -1,0 +1,4 @@
+[console_scripts]
+curator = curator.curator:main
+es_repo_mgr = curator.es_repo_mgr:main
+

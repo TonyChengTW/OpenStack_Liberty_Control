@@ -1,0 +1,12 @@
+[console_scripts]
+heat = heatclient.shell:main
+
+[openstack.cli.extension]
+orchestration = heatclient.osc.plugin
+
+[openstack.orchestration.v1]
+stack_create = heatclient.osc.v1.stack:CreateStack
+stack_list = heatclient.osc.v1.stack:ListStack
+stack_show = heatclient.osc.v1.stack:ShowStack
+stack_update = heatclient.osc.v1.stack:UpdateStack
+

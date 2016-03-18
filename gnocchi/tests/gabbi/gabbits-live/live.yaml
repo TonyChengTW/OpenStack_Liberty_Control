@@ -1,0 +1,102 @@
+#
+# Confirmation tests to run against a live web server.
+#
+# These act as a very basic sanity check.
+
+defaults:
+    request_headers:
+        x-auth-token: $ENVIRON['GNOCCHI_SERVICE_TOKEN']
+
+tests:
+
+    - name: check /
+      url: /
+
+    - name: check archive policies
+      url: /v1/archive_policy
+      response_headers:
+          content-type: /application/json/
+      response_strings:
+          - '{"definition": [{"points": 86400, "timespan": "1 day, 0:00:00", "granularity": "0:00:01"}, {"points": 43200, "timespan": "30 days, 0:00:00", "granularity": "0:01:00"}, {"points": 8760, "timespan": "365 days, 0:00:00", "granularity": "1:00:00"}], "back_window": 0, "name": "high", "aggregation_methods": ["std", "count", "95pct", "min", "max", "sum", "median", "mean"]}'
+          - '{"definition": [{"points": 12, "timespan": "1:00:00", "granularity": "0:05:00"}, {"points": 24, "timespan": "1 day, 0:00:00", "granularity": "1:00:00"}, {"points": 30, "timespan": "30 days, 0:00:00", "granularity": "1 day, 0:00:00"}], "back_window": 0, "name": "low", "aggregation_methods": ["std", "count", "95pct", "min", "max", "sum", "median", "mean"]}'
+          - '{"definition": [{"points": 60, "timespan": "1:00:00", "granularity": "0:01:00"}, {"points": 168, "timespan": "7 days, 0:00:00", "granularity": "1:00:00"}, {"points": 365, "timespan": "365 days, 0:00:00", "granularity": "1 day, 0:00:00"}], "back_window": 0, "name": "medium", "aggregation_methods": ["std", "count", "95pct", "min", "max", "sum", "median", "mean"]}'
+
+    - name: check generic resources with the default one for statsd
+      url: /v1/resource/generic
+      response_headers:
+          content-type: /application/json/
+      response_json_paths:
+          $[0].type: generic
+          $.`len`: 1
+
+    - name: post unicode archive policy
+      url: /v1/archive_policy
+      method: POST
+      request_headers:
+          content-type: application/json
+          x-roles: admin
+      data:
+          name: ✔éñ☃
+          definition:
+              - granularity: 1 minute
+                points: 20
+      status: 201
+      response_headers:
+          location: $SCHEME://$NETLOC/v1/archive_policy/%E2%9C%94%C3%A9%C3%B1%E2%98%83
+      response_json_paths:
+          name: ✔éñ☃
+
+    - name: get unicode archive policy
+      url:  $LOCATION
+      response_json_paths:
+          $.name: ✔éñ☃
+
+    - name: delete unicode archive policy
+      url: /v1/archive_policy/%E2%9C%94%C3%A9%C3%B1%E2%98%83
+      method: DELETE
+      status: 204
+
+    - name: post instance resource
+      url: /v1/resource/instance
+      method: post
+      request_headers:
+          content-type: application/json
+      data:
+          id: 75C44741-CC60-4033-804E-2D3098C7D2E9
+          user_id: 0fbb2314-8461-4b1a-8013-1fc22f6afc9c
+          project_id: f3d41b77-0cc1-4f0b-b94a-1d5be9c0e3ea
+          flavor_id: "2"
+          image_ref: http://image
+          host: compute1
+          display_name: myvm
+          metrics:
+              vcpus:
+                  archive_policy_name: medium
+      status: 201
+
+    - name: post some measures to the metric on instance
+      url: /v1/resource/instance/75C44741-CC60-4033-804E-2D3098C7D2E9/metric/vcpus/measures
+      request_headers:
+          content-type: application/json
+      method: POST
+      data:
+          - timestamp: "2015-03-06T14:33:57"
+            value: 2
+          - timestamp: "2015-03-06T14:34:12"
+            value: 2
+      status: 202
+
+    - name: get instance measures with poll
+      url: /v1/resource/instance/75C44741-CC60-4033-804E-2D3098C7D2E9/metric/vcpus/measures
+      # wait up to 60 seconds
+      poll:
+          count: 60
+          delay: 1
+      response_json_paths:
+          $[0][2]: 2
+          $[1][2]: 2
+
+    - name: delete the instance resource
+      url: /v1/resource/instance/75C44741-CC60-4033-804E-2D3098C7D2E9
+      method: DELETE
+      status: 204

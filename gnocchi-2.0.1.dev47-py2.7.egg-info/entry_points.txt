@@ -1,0 +1,60 @@
+[console_scripts]
+carbonara-dump = gnocchi.carbonara:dump_archive_file
+gnocchi-api = gnocchi.cli:api
+gnocchi-metricd = gnocchi.cli:metricd
+gnocchi-statsd = gnocchi.cli:statsd
+gnocchi-upgrade = gnocchi.cli:upgrade
+
+[gnocchi.aggregates]
+moving-average = gnocchi.aggregates.moving_stats:MovingAverage
+
+[gnocchi.controller.schemas]
+ceph_account = gnocchi.rest:GenericSchema
+generic = gnocchi.rest:GenericSchema
+host = gnocchi.rest:HostSchema
+host_disk = gnocchi.rest:HostDiskSchema
+host_network_interface = gnocchi.rest:HostNetworkInterfaceSchema
+identity = gnocchi.rest:GenericSchema
+image = gnocchi.rest:ImageSchema
+instance = gnocchi.rest:InstanceSchema
+instance_disk = gnocchi.rest:InstanceDiskSchema
+instance_network_interface = gnocchi.rest:InstanceNetworkInterfaceSchema
+ipmi = gnocchi.rest:GenericSchema
+network = gnocchi.rest:GenericSchema
+stack = gnocchi.rest:GenericSchema
+swift_account = gnocchi.rest:GenericSchema
+volume = gnocchi.rest:VolumeSchema
+
+[gnocchi.indexer]
+mysql = gnocchi.indexer.sqlalchemy:SQLAlchemyIndexer
+mysql+pymysql = gnocchi.indexer.sqlalchemy:SQLAlchemyIndexer
+null = gnocchi.indexer.null:NullIndexer
+postgresql = gnocchi.indexer.sqlalchemy:SQLAlchemyIndexer
+
+[gnocchi.indexer.resources]
+ceph_account = gnocchi.indexer.sqlalchemy_base:ResourceExt
+generic = gnocchi.indexer.sqlalchemy_base:Resource
+host = gnocchi.indexer.sqlalchemy_extension:Host
+host_disk = gnocchi.indexer.sqlalchemy_extension:HostDisk
+host_network_interface = gnocchi.indexer.sqlalchemy_extension:HostNetworkInterface
+identity = gnocchi.indexer.sqlalchemy_base:ResourceExt
+image = gnocchi.indexer.sqlalchemy_extension:Image
+instance = gnocchi.indexer.sqlalchemy_extension:Instance
+instance_disk = gnocchi.indexer.sqlalchemy_extension:InstanceDisk
+instance_network_interface = gnocchi.indexer.sqlalchemy_extension:InstanceNetworkInterface
+ipmi = gnocchi.indexer.sqlalchemy_base:ResourceExt
+network = gnocchi.indexer.sqlalchemy_base:ResourceExt
+stack = gnocchi.indexer.sqlalchemy_base:ResourceExt
+swift_account = gnocchi.indexer.sqlalchemy_base:ResourceExt
+volume = gnocchi.indexer.sqlalchemy_extension:Volume
+
+[gnocchi.storage]
+ceph = gnocchi.storage.ceph:CephStorage
+file = gnocchi.storage.file:FileStorage
+influxdb = gnocchi.storage.influxdb:InfluxDBStorage
+null = gnocchi.storage.null:NullStorage
+swift = gnocchi.storage.swift:SwiftStorage
+
+[oslo.config.opts]
+gnocchi = gnocchi.opts:list_opts
+

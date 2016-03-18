@@ -1,0 +1,47 @@
+[aodh.alarm.rule]
+combination = aodh.api.controllers.v2.alarm_rules.combination:AlarmCombinationRule
+event = aodh.api.controllers.v2.alarm_rules.event:AlarmEventRule
+gnocchi_aggregation_by_metrics_threshold = aodh.api.controllers.v2.alarm_rules.gnocchi:AggregationMetricsByIdLookupRule
+gnocchi_aggregation_by_resources_threshold = aodh.api.controllers.v2.alarm_rules.gnocchi:AggregationMetricByResourcesLookupRule
+gnocchi_resources_threshold = aodh.api.controllers.v2.alarm_rules.gnocchi:MetricOfResourceRule
+threshold = aodh.api.controllers.v2.alarm_rules.threshold:AlarmThresholdRule
+
+[aodh.evaluator]
+combination = aodh.evaluator.combination:CombinationEvaluator
+gnocchi_aggregation_by_metrics_threshold = aodh.evaluator.gnocchi:GnocchiThresholdEvaluator
+gnocchi_aggregation_by_resources_threshold = aodh.evaluator.gnocchi:GnocchiThresholdEvaluator
+gnocchi_resources_threshold = aodh.evaluator.gnocchi:GnocchiThresholdEvaluator
+threshold = aodh.evaluator.threshold:ThresholdEvaluator
+
+[aodh.notifier]
+http = aodh.notifier.rest:RestAlarmNotifier
+https = aodh.notifier.rest:RestAlarmNotifier
+log = aodh.notifier.log:LogAlarmNotifier
+test = aodh.notifier.test:TestAlarmNotifier
+trust+http = aodh.notifier.trust:TrustRestAlarmNotifier
+trust+https = aodh.notifier.trust:TrustRestAlarmNotifier
+
+[aodh.storage]
+hbase = aodh.storage.impl_hbase:Connection
+log = aodh.storage.impl_log:Connection
+mongodb = aodh.storage.impl_mongodb:Connection
+mysql = aodh.storage.impl_sqlalchemy:Connection
+mysql+pymysql = aodh.storage.impl_sqlalchemy:Connection
+postgresql = aodh.storage.impl_sqlalchemy:Connection
+sqlite = aodh.storage.impl_sqlalchemy:Connection
+
+[console_scripts]
+aodh-api = aodh.cmd.api:main
+aodh-dbsync = aodh.cmd.storage:dbsync
+aodh-evaluator = aodh.cmd.alarm:evaluator
+aodh-expirer = aodh.cmd.storage:expirer
+aodh-listener = aodh.cmd.alarm:listener
+aodh-notifier = aodh.cmd.alarm:notifier
+
+[keystoneauth1.plugin]
+password-aodh-legacy = aodh.keystone_client:LegacyAodhKeystoneLoader
+
+[oslo.config.opts]
+aodh = aodh.opts:list_opts
+aodh-auth = aodh.opts:list_keystoneauth_opts
+

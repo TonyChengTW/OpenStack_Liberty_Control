@@ -1,0 +1,38 @@
+Metadata-Version: 1.1
+Name: gnocchi
+Version: 2.0.1.dev47
+Summary: Metric as a Service
+Home-page: UNKNOWN
+Author: OpenStack
+Author-email: openstack-dev@lists.openstack.org
+License: UNKNOWN
+Description: ===============================
+         Gnocchi - Metric as a Service
+        ===============================
+        
+        .. image:: doc/source/gnocchi-logo.jpg
+        
+        Gnocchi is a multi-tenant timeseries, metrics and resources database. It
+        provides an `HTTP REST`_ interface to create and manipulate the data. It is
+        designed to store metrics at a very large scale while providing access to
+        metrics and resources information to operators and users.
+        
+        Gnocchi is part of the `OpenStack` project. While Gnocchi has support for
+        OpenStack, it is fully able to work stand-alone.
+        
+        You can read the full documentation online at http://gnocchi.xyz.
+        
+        .. _`HTTP REST`: https://en.wikipedia.org/wiki/Representational_state_transfer
+        
+        
+Platform: UNKNOWN
+Classifier: Environment :: OpenStack
+Classifier: Intended Audience :: Information Technology
+Classifier: Intended Audience :: System Administrators
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Topic :: System :: Monitoring

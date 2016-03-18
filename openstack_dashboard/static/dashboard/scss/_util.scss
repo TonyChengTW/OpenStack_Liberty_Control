@@ -1,0 +1,24 @@
+/* Some utility classes useful everywhere */
+
+.row .horizontal-center,
+.horizontal-center {
+  float: none;
+  margin: 0 auto;
+}
+
+// Used to x-scroll to Pre-formatted text.
+.pre_scrollable {
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+
+  pre {
+    word-wrap: normal;
+  }
+}
+
+// Set on an element that you would like to word wrap to container size
+.word-wrap {
+  width: 100%;
+  word-wrap: break-word;
+}

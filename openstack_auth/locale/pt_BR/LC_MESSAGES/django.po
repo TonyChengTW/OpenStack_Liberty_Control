@@ -1,0 +1,75 @@
+# Translations template for django_openstack_auth.
+# Copyright (C) 2015 ORGANIZATION
+# This file is distributed under the same license as the
+# django_openstack_auth project.
+#
+# Translators:
+# Andre Campos Bezerra <andrecbezerra@gmail.com>, 2015
+# Gabriel Wainer, 2015
+# OpenStack Infra <zanata@openstack.org>, 2015. #zanata
+msgid ""
+msgstr ""
+"Project-Id-Version: django_openstack_auth 2.0.1.dev11\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2015-10-16 17:42+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2015-07-27 01:38+0000\n"
+"Last-Translator: Gabriel Wainer\n"
+"Language: pt-BR\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Generated-By: Babel 2.0\n"
+"X-Generator: Zanata 3.7.1\n"
+"Language-Team: Portuguese (Brazil)\n"
+
+msgid "An error occurred authenticating. Please try again later."
+msgstr "Um erro ocorreu autenticando. Por favor tente novamente mais tarde."
+
+msgid "Authenticate using"
+msgstr "Autenticar usando"
+
+msgid "Domain"
+msgstr "Domínio"
+
+msgid "Invalid credentials."
+msgstr "Credencial Inválida"
+
+msgid ""
+"No authentication backend could be determined to handle the provided "
+"credentials."
+msgstr ""
+"Nenhuma autenticação poderia ser determinada para lidar com as credenciais "
+"fornecidas."
+
+msgid "Password"
+msgstr "Senha"
+
+#, python-format
+msgid "Project switch failed for user \"%(username)s\"."
+msgstr "A troca de projeto falhou para o usuário \"%(username)s\"."
+
+msgid "Region"
+msgstr "Região"
+
+#, python-format
+msgid "Switch to project \"%(project_name)s\" successful."
+msgstr "Troca para o projeto \"%(project_name)s\" realizada com sucesso."
+
+msgid "The authentication token issued by the Identity service has expired."
+msgstr "O token de autenticação emitido pelo serviço de identidade expirou."
+
+msgid "Unable to authenticate to any available projects."
+msgstr "Não foi possível autenticar nos projetos disponíveis."
+
+msgid "Unable to establish connection to keystone endpoint."
+msgstr "Não foi possível estabelecer conexão com o endpoint do Keystone."
+
+msgid "Unable to retrieve authorized projects."
+msgstr "Não foi possível obter os projetos autorizados."
+
+msgid "User Name"
+msgstr "Nome do Usuário"
+
+msgid "You are not authorized for any projects."
+msgstr "Você não está autorizado para nenhum projeto."

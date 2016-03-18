@@ -1,0 +1,13 @@
+[firewall_drivers]
+neutron.services.firewall.drivers.linux.iptables_fwaas.IptablesFwaasDriver = neutron_fwaas.services.firewall.drivers.linux.iptables_fwaas:IptablesFwaasDriver
+neutron.services.firewall.drivers.varmour.varmour_fwaas.vArmourFwaasDriver = neutron_fwaas.services.firewall.drivers.varmour.varmour_fwaas:vArmourFwaasDriver
+
+[neutron.db.alembic_migrations]
+neutron-fwaas = neutron_fwaas.db.migration:alembic_migrations
+
+[oslo.config.opts]
+firewall.agent = neutron_fwaas.opts:list_agent_opts
+
+[tempest.test_plugins]
+neutron-fwaas = neutron_fwaas.tests.tempest_plugin.plugin:NeutronFWaaSPlugin
+

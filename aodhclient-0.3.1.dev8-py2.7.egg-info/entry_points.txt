@@ -1,0 +1,6 @@
+[console_scripts]
+aodh = aodhclient.shell:main
+
+[keystoneauth1.plugin]
+aodh-noauth = aodhclient.noauth:AodhNoAuthLoader
+

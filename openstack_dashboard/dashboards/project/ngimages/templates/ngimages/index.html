@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Images" %}{% endblock %}
+
+{% block main %}
+  <ng-include src="'{{ STATIC_URL }}app/core/images/table/images-table.html'"></ng-include>
+{% endblock %}

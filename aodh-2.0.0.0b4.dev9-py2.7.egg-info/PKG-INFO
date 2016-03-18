@@ -1,0 +1,31 @@
+Metadata-Version: 1.1
+Name: aodh
+Version: 2.0.0.0b4.dev9
+Summary: OpenStack Telemetry Alarming
+Home-page: http://www.openstack.org/
+Author: OpenStack
+Author-email: openstack-dev@lists.openstack.org
+License: UNKNOWN
+Description: aodh
+        ====
+        
+        Release notes can be read online at:
+          http://docs.openstack.org/developer/aodh/releasenotes/index.html
+        
+        Documentation for the project can be found at:
+          http://docs.openstack.org/developer/aodh/
+        
+        The project home is at:
+          http://launchpad.net/aodh
+        
+        
+Platform: UNKNOWN
+Classifier: Environment :: OpenStack
+Classifier: Intended Audience :: Information Technology
+Classifier: Intended Audience :: System Administrators
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Topic :: System :: Monitoring

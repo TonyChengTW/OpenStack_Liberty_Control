@@ -1,0 +1,22 @@
+.navbar {
+  border-top: none;
+  border-right: none;
+  border-left: none;
+
+  // Specificity Required
+  .navbar-toggle {
+    border-color: transparent;
+  }
+
+  // Pushes the menu slightly down from the navbar
+  li > .dropdown-menu {
+    margin-top: 2px;
+  }
+}
+
+// Specificity required
+.topbar {
+  .navbar {
+    margin-bottom: 0;
+  }
+}
