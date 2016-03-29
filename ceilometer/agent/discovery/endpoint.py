@@ -31,14 +31,13 @@ class EndpointDiscovery(plugin.DiscoveryBase):
     to dividing the pollster's work into smaller pieces than a whole service
     at once. Example of this is the floating_ip pollster which calls
     nova.floating_ips.list() and therefore gets all floating IPs at once.
-    """
 
-""" Edit by Tony
+
+     Edit by Tony
     This discovery is only for:
     http://192.168.1.10:8774/v2/d04021d5a4144b4c9f579fdc1d1c2a9a
     http://192.168.1.10:9292
-"""
-
+     """
     @staticmethod
     def discover(manager, param=None):
         endpoints = keystone_client.get_service_catalog(
@@ -46,7 +45,7 @@ class EndpointDiscovery(plugin.DiscoveryBase):
                 service_type=param,
                 interface=cfg.CONF.service_credentials.interface,
                 region_name=cfg.CONF.service_credentials.region_name)
-        LOG.debug("Tony: endpoints = %s", endpoints)
+        LOG.debug(_LW('Tony: endpoints = %s', endpoints))
         if not endpoints:
             LOG.warning(_LW('No endpoints found for service %s'),
                         "<all services>" if param is None else param)
