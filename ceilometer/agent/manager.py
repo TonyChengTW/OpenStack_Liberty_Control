@@ -440,6 +440,7 @@ class AgentManager(service_base.BaseService):
                 resources.extend(discovery_cache[url])
                 continue
             name, param = self._parse_discoverer(url)
+            LOG.debug('Tony: name=%s , param=%s', name, param)
             discoverer = self._discoverer(name)
             if discoverer:
                 try:
