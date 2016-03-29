@@ -33,6 +33,12 @@ class EndpointDiscovery(plugin.DiscoveryBase):
     nova.floating_ips.list() and therefore gets all floating IPs at once.
     """
 
+""" Edit by Tony
+    This discovery is only for:
+    http://192.168.1.10:8774/v2/d04021d5a4144b4c9f579fdc1d1c2a9a
+    http://192.168.1.10:9292
+"""
+
     @staticmethod
     def discover(manager, param=None):
         endpoints = keystone_client.get_service_catalog(
