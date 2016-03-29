@@ -40,6 +40,7 @@ class EndpointDiscovery(plugin.DiscoveryBase):
                 service_type=param,
                 interface=cfg.CONF.service_credentials.interface,
                 region_name=cfg.CONF.service_credentials.region_name)
+        LOG.debug("Tony: endpoints = %s", endpoints)
         if not endpoints:
             LOG.warning(_LW('No endpoints found for service %s'),
                         "<all services>" if param is None else param)
