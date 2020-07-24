@@ -161,12 +161,12 @@ class VRRPInterfaceMonitor(app_manager.RyuApp):
 
             if ev.old_state == vrrp_event.VRRP_STATE_INITIALIZE:
                 if ev.new_state == vrrp_event.VRRP_STATE_MASTER:
-                    self.statistics.idle_to_master_transitions += 1
+                    self.statistics.idle_to_main_transitions += 1
                 else:
                     self.statistics.idle_to_backup_transitions += 1
             elif ev.old_state == vrrp_event.VRRP_STATE_MASTER:
-                self.statistics.master_to_backup_transitions += 1
+                self.statistics.main_to_backup_transitions += 1
             else:
-                self.statistics.backup_to_master_transitions += 1
+                self.statistics.backup_to_main_transitions += 1
         else:
             raise RuntimeError('unknown vrrp state %s' % ev.new_state)

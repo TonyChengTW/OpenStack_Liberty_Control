@@ -197,12 +197,12 @@ class TestCommit(TestBase):
         assert ltd_commits and len(ltd_commits) < len(all_commits)
 
         # show commits of multiple paths, resulting in a union of commits
-        less_ltd_commits = list(Commit.iter_items(self.rorepo, 'master', paths=('CHANGES', 'AUTHORS')))
+        less_ltd_commits = list(Commit.iter_items(self.rorepo, 'main', paths=('CHANGES', 'AUTHORS')))
         assert len(ltd_commits) < len(less_ltd_commits)
 
     def test_iter_items(self):
         # pretty not allowed
-        self.failUnlessRaises(ValueError, Commit.iter_items, self.rorepo, 'master', pretty="raw")
+        self.failUnlessRaises(ValueError, Commit.iter_items, self.rorepo, 'main', pretty="raw")
 
     def test_rev_list_bisect_all(self):
         """
@@ -226,7 +226,7 @@ class TestCommit(TestBase):
     @with_rw_directory
     def test_ambiguous_arg_iteration(self, rw_dir):
         rw_repo = Repo.init(os.path.join(rw_dir, 'test_ambiguous_arg'))
-        path = os.path.join(rw_repo.working_tree_dir, 'master')
+        path = os.path.join(rw_repo.working_tree_dir, 'main')
         touch(path)
         rw_repo.index.add([path])
         rw_repo.index.commit('initial commit')

@@ -71,8 +71,8 @@ class TestSubmodule(TestBase):
         assert sm.path == 'git/ext/gitdb'
         assert sm.path != sm.name                   # in our case, we have ids there, which don't equal the path
         assert sm.url.endswith('github.com/gitpython-developers/gitdb.git')
-        assert sm.branch_path == 'refs/heads/master'            # the default ...
-        assert sm.branch_name == 'master'
+        assert sm.branch_path == 'refs/heads/main'            # the default ...
+        assert sm.branch_name == 'main'
         assert sm.parent_commit == rwrepo.head.commit
         # size is always 0
         assert sm.size == 0
@@ -789,10 +789,10 @@ class TestSubmodule(TestBase):
         # Setup initial sandbox:
         # parent repo has one submodule, which has all the latest changes
         source_url = self._small_repo_url()
-        sm_source_repo = git.Repo.clone_from(source_url, os.path.join(rw_dir, 'sm-source'), b='master')
+        sm_source_repo = git.Repo.clone_from(source_url, os.path.join(rw_dir, 'sm-source'), b='main')
         parent_repo = git.Repo.init(os.path.join(rw_dir, 'parent'))
         sm = parent_repo.create_submodule('mysubmodule', 'subdir/submodule',
-                                          sm_source_repo.working_tree_dir, branch='master')
+                                          sm_source_repo.working_tree_dir, branch='main')
         parent_repo.index.commit('added submodule')
         assert sm.exists()
 
@@ -813,7 +813,7 @@ class TestSubmodule(TestBase):
         # verify submodule update with feature branch that leaves currently checked out branch in it's past
         sm_mod = sm.module()
         prev_commit = sm_mod.commit()
-        assert sm_mod.head.ref.name == 'master'
+        assert sm_mod.head.ref.name == 'main'
         assert parent_repo.submodule_update()
         assert sm_mod.head.ref.name == sm_fb.name
         assert sm_mod.commit() == prev_commit, "Without to_latest_revision, we don't change the commit"

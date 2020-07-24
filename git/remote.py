@@ -116,7 +116,7 @@ class PushInfo(object):
     @classmethod
     def _from_line(cls, remote, line):
         """Create a new PushInfo instance as parsed from line which is expected to be like
-            refs/heads/master:refs/heads/master 05d2687..1d0568e as bytes"""
+            refs/heads/main:refs/heads/main 05d2687..1d0568e as bytes"""
         control_character, from_to, summary = line.split('\t', 3)
         flags = 0
 
@@ -277,7 +277,7 @@ class FetchInfo(object):
         # END handle refspec
 
         # handle FETCH_HEAD and figure out ref type
-        # If we do not specify a target branch like master:refs/remotes/origin/master,
+        # If we do not specify a target branch like main:refs/remotes/origin/main,
         # the fetch result is stored in FETCH_HEAD which destroys the rule we usually
         # have. In that case we use a symbolic reference which is detached
         ref_type = None
@@ -440,7 +440,7 @@ class Remote(LazyMixin, Iterable):
         :return:
             IterableList of RemoteReference objects. It is prefixed, allowing
             you to omit the remote path portion, i.e.::
-            remote.refs.master # yields RemoteReference('/refs/remotes/origin/master')"""
+            remote.refs.main # yields RemoteReference('/refs/remotes/origin/main')"""
         out_refs = IterableList(RemoteReference._id_attribute_, "%s/" % self.name)
         out_refs.extend(RemoteReference.list_items(self.repo, remote=self.name))
         assert out_refs, "Remote %s did not have any references" % self.name
@@ -620,10 +620,10 @@ class Remote(LazyMixin, Iterable):
             A "refspec" is used by fetch and push to describe the mapping
             between remote ref and local ref. They are combined with a colon in
             the format <src>:<dst>, preceded by an optional plus sign, +.
-            For example: git fetch $URL refs/heads/master:refs/heads/origin means
-            "grab the master branch head from the $URL and store it as my origin
-            branch head". And git push $URL refs/heads/master:refs/heads/to-upstream
-            means "publish my master branch head as to-upstream branch at $URL".
+            For example: git fetch $URL refs/heads/main:refs/heads/origin means
+            "grab the main branch head from the $URL and store it as my origin
+            branch head". And git push $URL refs/heads/main:refs/heads/to-upstream
+            means "publish my main branch head as to-upstream branch at $URL".
             See also git-push(1).
 
             Taken from the git manual

@@ -93,24 +93,24 @@ def check_version(client):
         click.echo(click.style('ERROR: Incompatible with version {0} of Elasticsearch.  Exiting.'.format(".".join(map(str,version_number))), fg='red', bold=True))
         sys.exit(1)
 
-def check_master(client, master_only=False):
+def check_main(client, main_only=False):
     """
-    Check if master node.  If not, exit with error code
+    Check if main node.  If not, exit with error code
     """
-    if master_only and not is_master_node(client):
-        logger.info('Master-only flag detected. Connected to non-master node. Aborting.')
+    if main_only and not is_main_node(client):
+        logger.info('Main-only flag detected. Connected to non-main node. Aborting.')
         sys.exit(9)
 
 def get_client(**kwargs):
     """Return an Elasticsearch client using the provided parameters
 
     """
-    kwargs['master_only'] = False if not 'master_only' in kwargs else kwargs['master_only']
+    kwargs['main_only'] = False if not 'main_only' in kwargs else kwargs['main_only']
     kwargs['use_ssl'] = False if not 'use_ssl' in kwargs else kwargs['use_ssl']
     kwargs['ssl_no_validate'] = False if not 'ssl_no_validate' in kwargs else kwargs['ssl_no_validate']
     kwargs['certificate'] = False if not 'certificate' in kwargs else kwargs['certificate']
     logger.debug("kwargs = {0}".format(kwargs))
-    master_only = kwargs.pop('master_only')
+    main_only = kwargs.pop('main_only')
     if kwargs['use_ssl']:
         if kwargs['ssl_no_validate']:
             kwargs['verify_certs'] = False # Not needed, but explicitly defined
@@ -131,8 +131,8 @@ def get_client(**kwargs):
         client = elasticsearch.Elasticsearch(**kwargs)
         # Verify the version is acceptable.
         check_version(client)
-        # Verify "master_only" status, if applicable
-        check_master(client, master_only=master_only)
+        # Verify "main_only" status, if applicable
+        check_main(client, main_only=main_only)
         return client
     except Exception:
         click.echo(click.style('ERROR: Connection failure.', fg='red', bold=True))
@@ -211,7 +211,7 @@ def in_list(values, source_list):
             logger.warn('{0} not found!'.format(v))
     return retval
 
-def do_command(client, command, indices, params=None, master_timeout=30000):
+def do_command(client, command, indices, params=None, main_timeout=30000):
     """
     Do the command.
     """
@@ -226,7 +226,7 @@ def do_command(client, command, indices, params=None, master_timeout=30000):
     if command == "close":
         return close(client, indices)
     if command == "delete":
-        return delete(client, indices, master_timeout)
+        return delete(client, indices, main_timeout)
     if command == "open":
         return opener(client, indices)
     if command == "optimize":

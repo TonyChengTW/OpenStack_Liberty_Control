@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Parse a response to the 'ismaster' command."""
+"""Parse a response to the 'ismain' command."""
 
 import itertools
 
@@ -22,7 +22,7 @@ from pymongo.server_type import SERVER_TYPE
 
 
 def _get_server_type(doc):
-    """Determine the server type from an ismaster response."""
+    """Determine the server type from an ismain response."""
     if not doc.get('ok'):
         return SERVER_TYPE.Unknown
 
@@ -31,7 +31,7 @@ def _get_server_type(doc):
     elif doc.get('setName'):
         if doc.get('hidden'):
             return SERVER_TYPE.RSOther
-        elif doc.get('ismaster'):
+        elif doc.get('ismain'):
             return SERVER_TYPE.RSPrimary
         elif doc.get('secondary'):
             return SERVER_TYPE.RSSecondary
@@ -45,11 +45,11 @@ def _get_server_type(doc):
         return SERVER_TYPE.Standalone
 
 
-class IsMaster(object):
+class IsMain(object):
     __slots__ = ('_doc', '_server_type', '_is_writable', '_is_readable')
 
     def __init__(self, doc):
-        """Parse an ismaster response from the server."""
+        """Parse an ismain response from the server."""
         self._server_type = _get_server_type(doc)
         self._doc = doc
         self._is_writable = self._server_type in (

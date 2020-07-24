@@ -77,14 +77,14 @@ class VRRPCommon(app_manager.RyuApp):
 #                          i.interface,
 #                          i.state))
             assert len(rep.instance_list) == len(instances) * 2
-            num_of_master = 0
+            num_of_main = 0
             d = dict(((i.instance_name, i) for i in rep.instance_list))
             bad = 0
             for i in rep.instance_list:
                 assert i.state in (vrrp_event.VRRP_STATE_MASTER,
                                    vrrp_event.VRRP_STATE_BACKUP)
                 if i.state == vrrp_event.VRRP_STATE_MASTER:
-                    num_of_master += 1
+                    num_of_main += 1
 
                 vr = instances[i.config.vrid]
                 if (vr[0].config.priority > vr[1].config.priority and
@@ -92,7 +92,7 @@ class VRRPCommon(app_manager.RyuApp):
                    (vr[0].config.priority < vr[1].config.priority and
                         i.instance_name == vr[0].instance_name):
                     if i.state == vrrp_event.VRRP_STATE_MASTER:
-                        print("bad master:")
+                        print("bad main:")
                         print('%s %s' % (d[vr[0].instance_name].state,
                               d[vr[0].instance_name].config.priority))
                         print('%s %s' % (d[vr[1].instance_name].state,
@@ -101,13 +101,13 @@ class VRRPCommon(app_manager.RyuApp):
 #                       assert i.state != vrrp_event.VRRP_STATE_MASTER
             if bad > 0:
                 # this could be a transient state
-                print("%s bad masters" % bad)
+                print("%s bad mains" % bad)
                 time.sleep(1)
                 continue
-            if num_of_master >= len(instances):
-                assert num_of_master == len(instances)
+            if num_of_main >= len(instances):
+                assert num_of_main == len(instances)
                 break
-            print('%s / %s' % (num_of_master, len(instances)))
+            print('%s / %s' % (num_of_main, len(instances)))
             time.sleep(1)
             continue
 
@@ -197,7 +197,7 @@ class VRRPCommon(app_manager.RyuApp):
                 print("left %s" % len(rep.instance_list))
                 time.sleep(1)
             assert len(rep.instance_list) == len(instances)
-            print("waiting for the rest becoming master")
+            print("waiting for the rest becoming main")
             while True:
                 rep = vrrp_api.vrrp_list(self)
                 if all(i.state == vrrp_event.VRRP_STATE_MASTER

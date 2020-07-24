@@ -120,7 +120,7 @@ def delete_callback(ctx, param, value):
 @click.command(short_help='Filesystem Repository')
 @click.option('--repository', required=True, type=str, help='Repository name')
 @click.option('--location', required=True, type=str,
-            help='Shared file-system location. Must match remote path, & be accessible to all master & data nodes')
+            help='Shared file-system location. Must match remote path, & be accessible to all main & data nodes')
 @click.option('--compression', type=bool, default=True, show_default=True,
             help='Enable/Disable compression.')
 @click.option('--concurrent_streams', type=int, default=5, show_default=True,
@@ -190,14 +190,14 @@ def s3(
 @click.option('--use_ssl', help='Connect to Elasticsearch through SSL.', is_flag=True, default=DEFAULT_ARGS['use_ssl'])
 @click.option('--http_auth', help='Use Basic Authentication ex: user:pass', default=DEFAULT_ARGS['http_auth'])
 @click.option('--timeout', help='Connection timeout in seconds.', default=DEFAULT_ARGS['timeout'], type=int)
-@click.option('--master-only', is_flag=True, help='Only operate on elected master node.')
+@click.option('--main-only', is_flag=True, help='Only operate on elected main node.')
 @click.option('--debug', is_flag=True, help='Debug mode', default=DEFAULT_ARGS['debug'])
 @click.option('--loglevel', help='Log level', default=DEFAULT_ARGS['log_level'])
 @click.option('--logfile', help='log file')
 @click.option('--logformat', help='Log output format [default|logstash].', default=DEFAULT_ARGS['logformat'])
 @click.version_option(version=__version__)
 @click.pass_context
-def repomgrcli(ctx, host, url_prefix, port, use_ssl, http_auth, timeout, master_only, debug, loglevel, logfile, logformat):
+def repomgrcli(ctx, host, url_prefix, port, use_ssl, http_auth, timeout, main_only, debug, loglevel, logfile, logformat):
     """Repository manager for Elasticsearch Curator.
     """
 

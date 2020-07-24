@@ -201,7 +201,7 @@ class ComputeManagerUnitTestCase(test.NoDBTestCase):
         get_avail_nodes.return_value = avail_nodes
         get_rt.side_effect = _get_rt_side_effect
         self.compute.update_available_resource(ctxt)
-        get_db_nodes.assert_called_once_with(ctxt, use_slave=True)
+        get_db_nodes.assert_called_once_with(ctxt, use_subordinate=True)
         self.assertEqual([mock.call(node) for node in avail_nodes],
                          get_rt.call_args_list)
         for rt in rts:
@@ -413,7 +413,7 @@ class ComputeManagerUnitTestCase(test.NoDBTestCase):
             db.instance_get_all_by_host(
                     self.context, our_host,
                     columns_to_join=['info_cache', 'metadata'],
-                    use_slave=False
+                    use_subordinate=False
                     ).AndReturn(startup_instances)
             if defer_iptables_apply:
                 self.compute.driver.filter_defer_apply_on()
@@ -512,7 +512,7 @@ class ComputeManagerUnitTestCase(test.NoDBTestCase):
         context.get_admin_context().AndReturn(self.context)
         db.instance_get_all_by_host(self.context, our_host,
                                     columns_to_join=['info_cache', 'metadata'],
-                                    use_slave=False
+                                    use_subordinate=False
                                     ).AndReturn([])
         self.compute.init_virt_events()
 
@@ -1281,7 +1281,7 @@ class ComputeManagerUnitTestCase(test.NoDBTestCase):
                           inst in driver_instances]},
                 'created_at', 'desc', columns_to_join=None,
                 limit=None, marker=None,
-                use_slave=True).AndReturn(
+                use_subordinate=True).AndReturn(
                         driver_instances)
 
         self.mox.ReplayAll()
@@ -1332,7 +1332,7 @@ class ComputeManagerUnitTestCase(test.NoDBTestCase):
                 self.context, filters,
                 'created_at', 'desc', columns_to_join=None,
                 limit=None, marker=None,
-                use_slave=True).AndReturn(all_instances)
+                use_subordinate=True).AndReturn(all_instances)
 
         self.mox.ReplayAll()
 
@@ -1373,7 +1373,7 @@ class ComputeManagerUnitTestCase(test.NoDBTestCase):
             self.compute._sync_power_states(mock.sentinel.context)
             mock_get.assert_called_with(mock.sentinel.context,
                                         self.compute.host, expected_attrs=[],
-                                        use_slave=True)
+                                        use_subordinate=True)
             mock_spawn.assert_called_once_with(mock.ANY, instance)
 
     def _get_sync_instance(self, power_state, vm_state, task_state=None,
@@ -1392,7 +1392,7 @@ class ComputeManagerUnitTestCase(test.NoDBTestCase):
     def test_sync_instance_power_state_match(self):
         instance = self._get_sync_instance(power_state.RUNNING,
                                            vm_states.ACTIVE)
-        instance.refresh(use_slave=False)
+        instance.refresh(use_subordinate=False)
         self.mox.ReplayAll()
         self.compute._sync_instance_power_state(self.context, instance,
                                                 power_state.RUNNING)
@@ -1400,7 +1400,7 @@ class ComputeManagerUnitTestCase(test.NoDBTestCase):
     def test_sync_instance_power_state_running_stopped(self):
         instance = self._get_sync_instance(power_state.RUNNING,
                                            vm_states.ACTIVE)
-        instance.refresh(use_slave=False)
+        instance.refresh(use_subordinate=False)
         instance.save()
         self.mox.ReplayAll()
         self.compute._sync_instance_power_state(self.context, instance,
@@ -1411,7 +1411,7 @@ class ComputeManagerUnitTestCase(test.NoDBTestCase):
                            stop=True, force=False, shutdown_terminate=False):
         instance = self._get_sync_instance(
             power_state, vm_state, shutdown_terminate=shutdown_terminate)
-        instance.refresh(use_slave=False)
+        instance.refresh(use_subordinate=False)
         instance.save()
         self.mox.StubOutWithMock(self.compute.compute_api, 'stop')
         self.mox.StubOutWithMock(self.compute.compute_api, 'delete')
@@ -1483,7 +1483,7 @@ class ComputeManagerUnitTestCase(test.NoDBTestCase):
             mock_sync_power_state.assert_called_once_with(self.context,
                                                           db_instance,
                                                           power_state.NOSTATE,
-                                                          use_slave=True)
+                                                          use_subordinate=True)
 
     def test_run_pending_deletes(self):
         self.flags(instance_delete_interval=10)
@@ -1513,7 +1513,7 @@ class ComputeManagerUnitTestCase(test.NoDBTestCase):
              'cleaned': False},
             expected_attrs=['info_cache', 'security_groups',
                             'system_metadata'],
-            use_slave=True).AndReturn([a, b, c])
+            use_subordinate=True).AndReturn([a, b, c])
 
         self.mox.StubOutWithMock(self.compute.driver, 'delete_instance_files')
         self.compute.driver.delete_instance_files(
@@ -2746,7 +2746,7 @@ class ComputeManagerUnitTestCase(test.NoDBTestCase):
             self.compute._poll_bandwidth_usage(self.context)
             get_by_uuid_mac.assert_called_once_with(self.context,
                     uuids.instance, 'fake-mac',
-                    start_period=0, use_slave=True)
+                    start_period=0, use_subordinate=True)
             # NOTE(sdague): bw_usage_update happens at some time in
             # the future, so what last_refreshed is is irrelevant.
             bw_usage_update.assert_called_once_with(self.context,
@@ -2819,7 +2819,7 @@ class ComputeManagerUnitTestCase(test.NoDBTestCase):
         self.compute._sync_scheduler_instance_info(self.context)
         mock_get_by_host.assert_called_once_with(
                 fake_elevated, self.compute.host, expected_attrs=[],
-                use_slave=True)
+                use_subordinate=True)
         mock_sync.assert_called_once_with(fake_elevated, self.compute.host,
                                           exp_uuids)
 

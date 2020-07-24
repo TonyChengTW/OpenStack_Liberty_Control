@@ -99,7 +99,7 @@ class TestCommandLineArgument(utils.TestCase):
         self.assertTrue(mock_create.called)
 
         self._test_arg_success('bay-create --baymodel xxx --node-count 123 '
-                               '--master-count 123')
+                               '--main-count 123')
         self.assertTrue(mock_create.called)
 
         self._test_arg_success('bay-create --baymodel xxx '
@@ -223,7 +223,7 @@ class TestCommandLineArgument(utils.TestCase):
                                '--fixed-network public '
                                '--network-driver test_driver '
                                '--labels key=val '
-                               '--master-flavor-id test_flavor '
+                               '--main-flavor-id test_flavor '
                                '--docker-volume-size 10'
                                '--public')
         self.assertTrue(mock_create.called)
@@ -249,7 +249,7 @@ class TestCommandLineArgument(utils.TestCase):
         self.assertTrue(mock_create.called)
 
     @mock.patch('magnumclient.v1.baymodels.BayModelManager.create')
-    def test_baymodel_create_success_with_master_flavor(self, mock_create):
+    def test_baymodel_create_success_with_main_flavor(self, mock_create):
         self._test_arg_success('baymodel-create '
                                '--name test '
                                '--image-id test_image '
@@ -257,7 +257,7 @@ class TestCommandLineArgument(utils.TestCase):
                                '--external-network-id test_net '
                                '--coe swarm '
                                '--dns-nameserver test_dns '
-                               '--master-flavor-id test_flavor')
+                               '--main-flavor-id test_flavor')
         self.assertTrue(mock_create.called)
 
     @mock.patch('magnumclient.v1.baymodels.BayModelManager.create')

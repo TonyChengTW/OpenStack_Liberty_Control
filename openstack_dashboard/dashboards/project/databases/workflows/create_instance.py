@@ -231,7 +231,7 @@ class AdvancedAction(workflows.Action):
         choices=[
             ('', _('None')),
             ('backup', _('Restore from Backup')),
-            ('master', _('Replicate from Instance'))],
+            ('main', _('Replicate from Instance'))],
         widget=forms.Select(attrs={
             'class': 'switchable',
             'data-slug': 'initial_state'
@@ -245,14 +245,14 @@ class AdvancedAction(workflows.Action):
             'data-switch-on': 'initial_state',
             'data-initial_state-backup': _('Backup Name')
         }))
-    master = forms.ChoiceField(
-        label=_('Master Instance Name'),
+    main = forms.ChoiceField(
+        label=_('Main Instance Name'),
         required=False,
-        help_text=_('Select a master instance'),
+        help_text=_('Select a main instance'),
         widget=forms.Select(attrs={
             'class': 'switched',
             'data-switch-on': 'initial_state',
-            'data-initial_state-master': _('Master Instance Name')
+            'data-initial_state-main': _('Main Instance Name')
         }))
 
     class Meta(object):
@@ -273,7 +273,7 @@ class AdvancedAction(workflows.Action):
             choices.insert(0, ("", _("No backups available")))
         return choices
 
-    def populate_master_choices(self, request, context):
+    def populate_main_choices(self, request, context):
         try:
             instances = api.trove.instance_list(request)
             choices = [(i.id, i.name) for i in
@@ -303,22 +303,22 @@ class AdvancedAction(workflows.Action):
             else:
                 raise forms.ValidationError(_("A backup must be selected!"))
 
-            cleaned_data['master'] = None
-        elif initial_state == 'master':
-            master = self.cleaned_data['master']
-            if master:
+            cleaned_data['main'] = None
+        elif initial_state == 'main':
+            main = self.cleaned_data['main']
+            if main:
                 try:
-                    api.trove.instance_get(self.request, master)
+                    api.trove.instance_get(self.request, main)
                 except Exception:
                     raise forms.ValidationError(
-                        _("Unable to find master instance!"))
+                        _("Unable to find main instance!"))
             else:
                 raise forms.ValidationError(
-                    _("A master instance must be selected!"))
+                    _("A main instance must be selected!"))
 
             cleaned_data['backup'] = None
         else:
-            cleaned_data['master'] = None
+            cleaned_data['main'] = None
             cleaned_data['backup'] = None
 
         return cleaned_data
@@ -326,7 +326,7 @@ class AdvancedAction(workflows.Action):
 
 class Advanced(workflows.Step):
     action_class = AdvancedAction
-    contributes = ['backup', 'master']
+    contributes = ['backup', 'main']
 
 
 class LaunchInstance(workflows.Workflow):
@@ -400,7 +400,7 @@ class LaunchInstance(workflows.Workflow):
                      datastore, datastore_version,
                      self._get_databases(context), self._get_users(context),
                      self._get_backup(context), self._get_nics(context),
-                     context.get('master'))
+                     context.get('main'))
             api.trove.instance_create(request,
                                       context['name'],
                                       context['volume'],
@@ -411,7 +411,7 @@ class LaunchInstance(workflows.Workflow):
                                       users=self._get_users(context),
                                       restore_point=self._get_backup(context),
                                       nics=self._get_nics(context),
-                                      replica_of=context.get('master'))
+                                      replica_of=context.get('main'))
             return True
         except Exception:
             exceptions.handle(request)

@@ -35,7 +35,7 @@ class VRRPDumper(app_manager.RyuApp):
         self.logger.info('state change %s: %s -> %s', ev.instance_name,
                          old_state, new_state)
         if new_state == vrrp_event.VRRP_STATE_MASTER:
-            self.logger.info('becomes master')
+            self.logger.info('becomes main')
             if old_state is None:
                 # RFC3768 6.4.1
                 # o  Broadcast a gratuitous ARP request containing the virtual

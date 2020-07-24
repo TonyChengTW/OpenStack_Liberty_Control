@@ -1654,17 +1654,17 @@ class Connection(object):
             _lib.SSL3_RANDOM_SIZE)[:]
 
 
-    def master_key(self):
+    def main_key(self):
         """
-        Get a copy of the master key.
+        Get a copy of the main key.
 
         :return: A string representing the state
         """
         if self._ssl.session == _ffi.NULL:
             return None
         return _ffi.buffer(
-            self._ssl.session.master_key,
-            self._ssl.session.master_key_length)[:]
+            self._ssl.session.main_key,
+            self._ssl.session.main_key_length)[:]
 
 
     def sock_shutdown(self, *args, **kwargs):

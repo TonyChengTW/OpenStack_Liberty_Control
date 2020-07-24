@@ -369,7 +369,7 @@ class Mapper(SubMapperParent):
         self.urlcache = LRUCache(1600)
         self._created_regs = False
         self._created_gens = False
-        self._master_regexp = None
+        self._main_regexp = None
         self.prefix = None
         self.req_data = threading.local()
         self.directory = directory
@@ -609,13 +609,13 @@ class Mapper(SubMapperParent):
         if self.prefix:
             self._regprefix = re.compile(self.prefix + '(.*)')
 
-        # Save the master regexp
+        # Save the main regexp
         regexp = '|'.join(['(?:%s)' % x for x in regexps])
-        self._master_reg = regexp
+        self._main_reg = regexp
         try:
-            self._master_regexp = re.compile(regexp)
+            self._main_regexp = re.compile(regexp)
         except OverflowError:
-            self._master_regexp = None
+            self._main_regexp = None
         self._created_regs = True
 
     def _match(self, url, environ):
@@ -652,10 +652,10 @@ class Mapper(SubMapperParent):
         domain_match = self.domain_match
         debug = self.debug
 
-        if self._master_regexp is not None:
+        if self._main_regexp is not None:
             # Check to see if its a valid url against the main regexp
             # Done for faster invalid URL elimination
-            valid_url = re.match(self._master_regexp, url)
+            valid_url = re.match(self._main_regexp, url)
         else:
             # Regex is None due to OverflowError caused by too many routes.
             # This will allow larger projects to work but might increase time

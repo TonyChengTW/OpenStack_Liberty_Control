@@ -74,7 +74,7 @@ class SessionTestCase(stubs.XenAPITestBaseNoDB):
         # First login fails, second login in except block succeeds,
         # third login for the pool succeeds
         sess.login_with_password.side_effect = [
-                XenAPI.Failure(['HOST_IS_SLAVE', 'master']), None, None]
+                XenAPI.Failure(['HOST_IS_SLAVE', 'main']), None, None]
         mock_version.return_value = ('version', 'brand')
 
         session.XenAPISession('url', 'username', 'password')

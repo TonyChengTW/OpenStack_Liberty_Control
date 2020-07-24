@@ -427,13 +427,13 @@ class V6000FCDriver(driver.FibreChannelDriver):
         free_gb = 0
         v = self.common.vip
 
-        master_cluster_id = v.basic.get_node_values(
-            '/cluster/state/master_id').values()[0]
+        main_cluster_id = v.basic.get_node_values(
+            '/cluster/state/main_id').values()[0]
 
         bn1 = "/vshare/state/global/%s/container/%s/total_bytes" \
-            % (master_cluster_id, self.common.container)
+            % (main_cluster_id, self.common.container)
         bn2 = "/vshare/state/global/%s/container/%s/free_bytes" \
-            % (master_cluster_id, self.common.container)
+            % (main_cluster_id, self.common.container)
         resp = v.basic.get_node_values([bn1, bn2])
 
         if bn1 in resp:

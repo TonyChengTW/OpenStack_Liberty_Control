@@ -142,10 +142,10 @@ class TestCoordinate(tests_base.BaseTestCase):
     def _older_by(self, offset):
         return self.partition_coordinator.this.priority - offset
 
-    def _check_mastership(self, expected):
-        self.partition_coordinator.check_mastership(self.test_interval,
+    def _check_mainship(self, expected):
+        self.partition_coordinator.check_mainship(self.test_interval,
                                                     self.api_client)
-        self.assertEqual(expected, self.partition_coordinator.is_master)
+        self.assertEqual(expected, self.partition_coordinator.is_main)
 
     def _new_partition(self, offset):
         younger = self._younger_by(offset)
@@ -188,26 +188,26 @@ class TestCoordinate(tests_base.BaseTestCase):
         self.assertEqual(expected_assignments, len(rpc.assign.call_args_list))
         rpc.reset_mock()
 
-    def test_mastership_not_assumed_during_warmup(self):
+    def test_mainship_not_assumed_during_warmup(self):
         self._no_alarms()
 
         for _ in moves.xrange(7):
             # still warming up
             self._advance_time(0.25)
-            self._check_mastership(False)
+            self._check_mainship(False)
 
         # now warmed up
         self._advance_time(0.25)
-        self._check_mastership(True)
+        self._check_mainship(True)
 
-    def test_uncontested_mastership_assumed(self):
+    def test_uncontested_mainship_assumed(self):
         self._no_alarms()
 
         self._advance_time(3)
 
-        self._check_mastership(True)
+        self._check_mainship(True)
 
-    def test_contested_mastership_assumed(self):
+    def test_contested_mainship_assumed(self):
         self._no_alarms()
 
         self._advance_time(3)
@@ -216,38 +216,38 @@ class TestCoordinate(tests_base.BaseTestCase):
             younger = self._younger_by(offset)
             self.partition_coordinator.presence(uuid.uuid4(), younger)
 
-        self._check_mastership(True)
+        self._check_mainship(True)
 
-    def test_bested_mastership_relinquished(self):
+    def test_bested_mainship_relinquished(self):
         self._no_alarms()
 
         self._advance_time(3)
 
-        self._check_mastership(True)
+        self._check_mainship(True)
 
         older = self._older_by(1)
         self.partition_coordinator.presence(uuid.uuid4(), older)
 
-        self._check_mastership(False)
+        self._check_mainship(False)
 
-    def _do_test_tie_broken_mastership(self, seed, expect_mastership):
+    def _do_test_tie_broken_mainship(self, seed, expect_mainship):
         self._no_alarms()
         self.partition_coordinator.this.uuid = uuid.UUID(int=1)
 
         self._advance_time(3)
 
-        self._check_mastership(True)
+        self._check_mainship(True)
 
         tied = self.partition_coordinator.this.priority
         self.partition_coordinator.presence(uuid.UUID(int=seed), tied)
 
-        self._check_mastership(expect_mastership)
+        self._check_mainship(expect_mainship)
 
-    def test_tie_broken_mastership_assumed(self):
-        self._do_test_tie_broken_mastership(2, True)
+    def test_tie_broken_mainship_assumed(self):
+        self._do_test_tie_broken_mainship(2, True)
 
-    def test_tie_broken_mastership_relinquished(self):
-        self._do_test_tie_broken_mastership(0, False)
+    def test_tie_broken_mainship_relinquished(self):
+        self._do_test_tie_broken_mainship(0, False)
 
     def test_fair_distribution(self):
         alarm_ids = self._some_alarms(49)
@@ -256,7 +256,7 @@ class TestCoordinate(tests_base.BaseTestCase):
 
         others = [self._new_partition(i) for i in moves.xrange(1, 5)]
 
-        self._check_mastership(True)
+        self._check_mainship(True)
 
         remainder = self._check_assignments(others, alarm_ids, 10)
         self.assertEqual(set(self.partition_coordinator.assignment),
@@ -269,12 +269,12 @@ class TestCoordinate(tests_base.BaseTestCase):
 
         others = [self._new_partition(i) for i in moves.xrange(1, 5)]
 
-        self._check_mastership(True)
+        self._check_mainship(True)
 
         self. _forget_assignments(4)
 
         others.append(self._new_partition(5))
-        self._check_mastership(True)
+        self._check_mainship(True)
 
         remainder = self._check_assignments(others, alarm_ids, 9)
         self.assertEqual(set(self.partition_coordinator.assignment),
@@ -287,7 +287,7 @@ class TestCoordinate(tests_base.BaseTestCase):
 
         others = [self._new_partition(i) for i in moves.xrange(1, 5)]
 
-        self._check_mastership(True)
+        self._check_mainship(True)
 
         self. _forget_assignments(4)
 
@@ -297,7 +297,7 @@ class TestCoordinate(tests_base.BaseTestCase):
         for pid, younger in others:
             self.partition_coordinator.presence(pid, younger)
 
-        self._check_mastership(True)
+        self._check_mainship(True)
 
         remainder = self._check_assignments(others, alarm_ids, 13, [stale])
         self.assertEqual(set(self.partition_coordinator.assignment),
@@ -310,13 +310,13 @@ class TestCoordinate(tests_base.BaseTestCase):
 
         others = [self._new_partition(i) for i in moves.xrange(1, 5)]
 
-        self._check_mastership(True)
+        self._check_mainship(True)
 
         self._forget_assignments(4)
 
         alarm_ids = self._dump_alarms(len(alarm_ids) / 2)
 
-        self._check_mastership(True)
+        self._check_mainship(True)
 
         remainder = self._check_assignments(others, alarm_ids, 5)
         self.assertEqual(set(self.partition_coordinator.assignment),
@@ -329,13 +329,13 @@ class TestCoordinate(tests_base.BaseTestCase):
 
         others = [self._new_partition(i) for i in moves.xrange(1, 5)]
 
-        self._check_mastership(True)
+        self._check_mainship(True)
 
         self._forget_assignments(4)
 
         alarm_ids = self._dump_alarms(45)
 
-        self._check_mastership(True)
+        self._check_mainship(True)
 
         expect_uneffected = [pid for pid, _ in others]
         self._check_assignments(others, alarm_ids, 10, expect_uneffected)
@@ -347,19 +347,19 @@ class TestCoordinate(tests_base.BaseTestCase):
 
         others = [self._new_partition(i) for i in moves.xrange(1, 5)]
 
-        self._check_mastership(True)
+        self._check_mainship(True)
 
         self._forget_assignments(4)
 
         new_alarm_ids = self._add_alarms(8)
 
-        master_assignment = set(self.partition_coordinator.assignment)
-        self._check_mastership(True)
+        main_assignment = set(self.partition_coordinator.assignment)
+        self._check_mainship(True)
 
         remainder = self._check_allocation(others, new_alarm_ids, 2)
         self.assertEqual(0, len(remainder))
         self.assertEqual(set(self.partition_coordinator.assignment),
-                         master_assignment)
+                         main_assignment)
 
     def test_bail_when_overtaken_in_distribution(self):
         self._some_alarms(49)
@@ -375,7 +375,7 @@ class TestCoordinate(tests_base.BaseTestCase):
         rpc = self.partition_coordinator.coordination_rpc
         rpc.assign.side_effect = overtake
 
-        self._check_mastership(False)
+        self._check_mainship(False)
 
         self.assertEqual(1, len(rpc.assign.call_args_list))
 
@@ -421,12 +421,12 @@ class TestCoordinate(tests_base.BaseTestCase):
             self.partition_coordinator.oldest, True)
         self.assertIsNone(self.partition_coordinator.oldest)
 
-    def test_check_mastership(self):
+    def test_check_mainship(self):
         # Test the method exception condition.
-        self.partition_coordinator._is_master = mock.Mock(
+        self.partition_coordinator._is_main = mock.Mock(
             side_effect=Exception('Boom!'))
-        self.partition_coordinator.check_mastership(10, None)
-        self.assertIn('mastership check failed',
+        self.partition_coordinator.check_mainship(10, None)
+        self.assertIn('mainship check failed',
                       self.str_handler.messages['error'])
 
     def test_report_presence(self):

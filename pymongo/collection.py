@@ -172,7 +172,7 @@ class Collection(common.BaseObject):
     def _socket_for_writes(self):
         return self.__database.client._socket_for_writes()
 
-    def _command(self, sock_info, command, slave_ok=False,
+    def _command(self, sock_info, command, subordinate_ok=False,
                  read_preference=None,
                  codec_options=None, check=True, allowable_errors=None,
                  read_concern=DEFAULT_READ_CONCERN):
@@ -181,7 +181,7 @@ class Collection(common.BaseObject):
         :Parameters:
           - `sock_info` - A SocketInfo instance.
           - `command` - The command itself, as a SON instance.
-          - `slave_ok`: whether to set the SlaveOkay wire protocol bit.
+          - `subordinate_ok`: whether to set the SubordinateOkay wire protocol bit.
           - `codec_options` (optional) - An instance of
             :class:`~bson.codec_options.CodecOptions`.
           - `check`: raise OperationFailure if there are errors
@@ -197,7 +197,7 @@ class Collection(common.BaseObject):
         """
         return sock_info.command(self.__database.name,
                                  command,
-                                 slave_ok,
+                                 subordinate_ok,
                                  read_preference or self.read_preference,
                                  codec_options or self.codec_options,
                                  check,
@@ -1111,7 +1111,7 @@ class Collection(common.BaseObject):
            Added the `cursor_type`, `oplog_replay`, and `modifiers` options.
            Removed the `network_timeout`, `read_preference`, `tag_sets`,
            `secondary_acceptable_latency_ms`, `max_scan`, `snapshot`,
-           `tailable`, `await_data`, `exhaust`, `as_class`, and slave_okay
+           `tailable`, `await_data`, `exhaust`, `as_class`, and subordinate_okay
            parameters. Removed `compile_re` option: PyMongo now always
            represents BSON regular expressions as :class:`~bson.regex.Regex`
            objects. Use :meth:`~bson.regex.Regex.try_compile` to attempt to
@@ -1182,8 +1182,8 @@ class Collection(common.BaseObject):
         cmd = SON([('parallelCollectionScan', self.__name),
                    ('numCursors', num_cursors)])
 
-        with self._socket_for_reads() as (sock_info, slave_ok):
-            result = self._command(sock_info, cmd, slave_ok,
+        with self._socket_for_reads() as (sock_info, subordinate_ok):
+            result = self._command(sock_info, cmd, subordinate_ok,
                                    read_concern=self.read_concern)
 
         return [CommandCursor(self, cursor['cursor'], sock_info.address)
@@ -1191,8 +1191,8 @@ class Collection(common.BaseObject):
 
     def _count(self, cmd):
         """Internal count helper."""
-        with self._socket_for_reads() as (sock_info, slave_ok):
-            res = self._command(sock_info, cmd, slave_ok,
+        with self._socket_for_reads() as (sock_info, subordinate_ok):
+            res = self._command(sock_info, cmd, subordinate_ok,
                                 allowable_errors=["ns missing"],
                                 codec_options=self.codec_options._replace(
                                     document_class=dict),
@@ -1483,10 +1483,10 @@ class Collection(common.BaseObject):
         """
         codec_options = CodecOptions(SON)
         coll = self.with_options(codec_options)
-        with self._socket_for_primary_reads() as (sock_info, slave_ok):
+        with self._socket_for_primary_reads() as (sock_info, subordinate_ok):
             cmd = SON([("listIndexes", self.__name), ("cursor", {})])
             if sock_info.max_wire_version > 2:
-                cursor = self._command(sock_info, cmd, slave_ok,
+                cursor = self._command(sock_info, cmd, subordinate_ok,
                                        ReadPreference.PRIMARY,
                                        codec_options)["cursor"]
                 return CommandCursor(coll, cursor, sock_info.address)
@@ -1494,7 +1494,7 @@ class Collection(common.BaseObject):
                 namespace = _UJOIN % (self.__database.name, "system.indexes")
                 res = helpers._first_batch(
                     sock_info, self.__database.name, "system.indexes",
-                    {"ns": self.__full_name}, 0, slave_ok, codec_options,
+                    {"ns": self.__full_name}, 0, subordinate_ok, codec_options,
                     ReadPreference.PRIMARY, cmd,
                     self.database.client._event_listeners)
                 data = res["data"]
@@ -1544,13 +1544,13 @@ class Collection(common.BaseObject):
         information on the possible options. Returns an empty
         dictionary if the collection has not been created yet.
         """
-        with self._socket_for_primary_reads() as (sock_info, slave_ok):
+        with self._socket_for_primary_reads() as (sock_info, subordinate_ok):
             if sock_info.max_wire_version > 2:
                 criteria = {"name": self.__name}
             else:
                 criteria = {"name": self.__full_name}
             cursor = self.__database._list_collections(sock_info,
-                                                       slave_ok,
+                                                       subordinate_ok,
                                                        criteria)
 
         result = None
@@ -1645,7 +1645,7 @@ class Collection(common.BaseObject):
             "useCursor", kwargs.pop("useCursor", True))
         # If the server does not support the "cursor" option we
         # ignore useCursor and batchSize.
-        with self._socket_for_reads() as (sock_info, slave_ok):
+        with self._socket_for_reads() as (sock_info, subordinate_ok):
             if sock_info.max_wire_version > 0:
                 if use_cursor:
                     if "cursor" not in kwargs:
@@ -1659,12 +1659,12 @@ class Collection(common.BaseObject):
             # pipeline.
             if sock_info.max_wire_version >= 4 and 'readConcern' not in cmd:
                 if pipeline and '$out' in pipeline[-1]:
-                    result = self._command(sock_info, cmd, slave_ok)
+                    result = self._command(sock_info, cmd, subordinate_ok)
                 else:
-                    result = self._command(sock_info, cmd, slave_ok,
+                    result = self._command(sock_info, cmd, subordinate_ok,
                                            read_concern=self.read_concern)
             else:
-                result = self._command(sock_info, cmd, slave_ok)
+                result = self._command(sock_info, cmd, subordinate_ok)
 
             if "cursor" in result:
                 cursor = result["cursor"]
@@ -1726,8 +1726,8 @@ class Collection(common.BaseObject):
         cmd = SON([("group", group)])
         cmd.update(kwargs)
 
-        with self._socket_for_reads() as (sock_info, slave_ok):
-            return self._command(sock_info, cmd, slave_ok)["retval"]
+        with self._socket_for_reads() as (sock_info, subordinate_ok):
+            return self._command(sock_info, cmd, subordinate_ok)["retval"]
 
     def rename(self, new_name, **kwargs):
         """Rename this collection.
@@ -1794,8 +1794,8 @@ class Collection(common.BaseObject):
                 raise ConfigurationError("can't pass both filter and query")
             kwargs["query"] = filter
         cmd.update(kwargs)
-        with self._socket_for_reads() as (sock_info, slave_ok):
-            return self._command(sock_info, cmd, slave_ok,
+        with self._socket_for_reads() as (sock_info, subordinate_ok):
+            return self._command(sock_info, cmd, subordinate_ok,
                                  read_concern=self.read_concern)["values"]
 
     def map_reduce(self, map, reduce, out, full_response=False, **kwargs):
@@ -1846,15 +1846,15 @@ class Collection(common.BaseObject):
                    ("out", out)])
         cmd.update(kwargs)
 
-        with self._socket_for_primary_reads() as (sock_info, slave_ok):
+        with self._socket_for_primary_reads() as (sock_info, subordinate_ok):
             if (sock_info.max_wire_version >= 4 and 'readConcern' not in cmd and
                     'inline' in cmd['out']):
                 response = self._command(
-                    sock_info, cmd, slave_ok, ReadPreference.PRIMARY,
+                    sock_info, cmd, subordinate_ok, ReadPreference.PRIMARY,
                     read_concern=self.read_concern)
             else:
                 response = self._command(
-                    sock_info, cmd, slave_ok, ReadPreference.PRIMARY)
+                    sock_info, cmd, subordinate_ok, ReadPreference.PRIMARY)
 
         if full_response or not response.get('result'):
             return response
@@ -1895,13 +1895,13 @@ class Collection(common.BaseObject):
                    ("reduce", reduce),
                    ("out", {"inline": 1})])
         cmd.update(kwargs)
-        with self._socket_for_reads() as (sock_info, slave_ok):
+        with self._socket_for_reads() as (sock_info, subordinate_ok):
             if sock_info.max_wire_version >= 4 and 'readConcern' not in cmd:
-                res = self._command(sock_info, cmd, slave_ok,
+                res = self._command(sock_info, cmd, subordinate_ok,
                                     read_concern=self.read_concern)
             else:
-                res = self._command(sock_info, cmd, slave_ok)
-            res = self._command(sock_info, cmd, slave_ok)
+                res = self._command(sock_info, cmd, subordinate_ok)
+            res = self._command(sock_info, cmd, subordinate_ok)
 
         if full_response:
             return res

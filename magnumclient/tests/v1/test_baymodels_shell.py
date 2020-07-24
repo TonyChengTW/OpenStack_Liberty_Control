@@ -32,7 +32,7 @@ class ShellTest(shell_test_base.TestCommandLineArgument):
                                '--fixed-network public '
                                '--network-driver test_driver '
                                '--labels key=val '
-                               '--master-flavor-id test_flavor '
+                               '--main-flavor-id test_flavor '
                                '--docker-volume-size 10'
                                '--public')
         self.assertTrue(mock_create.called)
@@ -58,7 +58,7 @@ class ShellTest(shell_test_base.TestCommandLineArgument):
         self.assertTrue(mock_create.called)
 
     @mock.patch('magnumclient.v1.baymodels.BayModelManager.create')
-    def test_baymodel_create_success_with_master_flavor(self, mock_create):
+    def test_baymodel_create_success_with_main_flavor(self, mock_create):
         self._test_arg_success('baymodel-create '
                                '--name test '
                                '--image-id test_image '
@@ -66,7 +66,7 @@ class ShellTest(shell_test_base.TestCommandLineArgument):
                                '--external-network-id test_net '
                                '--coe swarm '
                                '--dns-nameserver test_dns '
-                               '--master-flavor-id test_flavor')
+                               '--main-flavor-id test_flavor')
         self.assertTrue(mock_create.called)
 
     @mock.patch('magnumclient.v1.baymodels.BayModelManager.create')

@@ -25,7 +25,7 @@ class ClusterTemplateTest(base.BaseTestCase):
         'plugin_name': 'plugin',
         'hadoop_version': '1',
         'node_groups': {
-            'name': 'master-node',
+            'name': 'main-node',
             'flavor_id': '2',
             'node_processes': ['namenode'],
             'count': 1
@@ -40,7 +40,7 @@ class ClusterTemplateTest(base.BaseTestCase):
             'plugin_name': 'plugin',
             'hadoop_version': '1',
             'node_groups': {
-                'name': 'master-node',
+                'name': 'main-node',
                 'flavor_id': '3',
                 'node_processes': ['namenode', 'datanode'],
                 'count': 1

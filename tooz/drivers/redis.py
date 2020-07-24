@@ -122,21 +122,21 @@ class RedisDriver(coordination._RunWatchersMixin,
       or failures occur (even redis clustering docs state it is
       not a fully AP or CP solution, which means even with it there
       will still be *potential* inconsistencies).
-    - Master/slave failover (when setup with redis `sentinel`_), giving
+    - Main/subordinate failover (when setup with redis `sentinel`_), giving
       some notion of HA (values *can* be lost when a failover transition
       occurs).
 
     To use a `sentinel`_ the connection URI must point to the sentinel server.
     At connection time the sentinel will be asked for the current IP and port
-    of the master and then connect there. The connection URI for sentinel
+    of the main and then connect there. The connection URI for sentinel
     should be written as follows::
 
-      redis://<sentinel host>:<sentinel port>?sentinel=<master name>
+      redis://<sentinel host>:<sentinel port>?sentinel=<main name>
 
     Additional sentinel hosts are listed with multiple ``sentinel_fallback``
     parameters as follows::
 
-        redis://<sentinel host>:<sentinel port>?sentinel=<master name>&
+        redis://<sentinel host>:<sentinel port>?sentinel=<main name>&
           sentinel_fallback=<other sentinel host>:<sentinel port>&
           sentinel_fallback=<other sentinel host>:<sentinel port>&
           sentinel_fallback=<other sentinel host>:<sentinel port>
@@ -402,7 +402,7 @@ return 1
         if 'socket_timeout' not in kwargs:
             kwargs['socket_timeout'] = default_socket_timeout
 
-        # Ask the sentinel for the current master if there is a
+        # Ask the sentinel for the current main if there is a
         # sentinel arg.
         if 'sentinel' in kwargs:
             sentinel_hosts = [
@@ -417,10 +417,10 @@ return 1
             del kwargs['sentinel']
             if 'sentinel_fallback' in kwargs:
                 del kwargs['sentinel_fallback']
-            master_client = sentinel_server.master_for(sentinel_name, **kwargs)
-            # The master_client is a redis.StrictRedis using a
+            main_client = sentinel_server.main_for(sentinel_name, **kwargs)
+            # The main_client is a redis.StrictRedis using a
             # Sentinel managed connection pool.
-            return master_client
+            return main_client
         return redis.StrictRedis(**kwargs)
 
     def _start(self):

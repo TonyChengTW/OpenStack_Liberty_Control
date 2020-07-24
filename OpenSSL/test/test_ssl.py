@@ -2045,7 +2045,7 @@ class ConnectionTests(TestCase, _LoopbackMixin):
     """
     # XXX get_peer_certificate -> None
     # XXX sock_shutdown
-    # XXX master_key -> TypeError
+    # XXX main_key -> TypeError
     # XXX server_random -> TypeError
     # XXX state_string
     # XXX connect -> TypeError
@@ -2534,11 +2534,11 @@ class ConnectionTests(TestCase, _LoopbackMixin):
         # This is a proxy: in general, we have no access to any unique
         # identifier for the session (new enough versions of OpenSSL expose a
         # hash which could be usable, but "new enough" is very, very new).
-        # Instead, exploit the fact that the master key is re-used if the
-        # session is re-used.  As long as the master key for the two connections
+        # Instead, exploit the fact that the main key is re-used if the
+        # session is re-used.  As long as the main key for the two connections
         # is the same, the session was re-used!
         self.assertEqual(
-            originalServer.master_key(), resumedServer.master_key())
+            originalServer.main_key(), resumedServer.main_key())
 
 
     def test_set_session_wrong_method(self):
@@ -3365,7 +3365,7 @@ class MemoryBIOTests(TestCase, _LoopbackMixin):
         client_conn = self._client(None)
 
         # There should be no key or nonces yet.
-        self.assertIdentical(server_conn.master_key(), None)
+        self.assertIdentical(server_conn.main_key(), None)
         self.assertIdentical(server_conn.client_random(), None)
         self.assertIdentical(server_conn.server_random(), None)
 
@@ -3376,7 +3376,7 @@ class MemoryBIOTests(TestCase, _LoopbackMixin):
             self._interactInMemory(client_conn, server_conn), None)
 
         # Now that the handshake is done, there should be a key and nonces.
-        self.assertNotIdentical(server_conn.master_key(), None)
+        self.assertNotIdentical(server_conn.main_key(), None)
         self.assertNotIdentical(server_conn.client_random(), None)
         self.assertNotIdentical(server_conn.server_random(), None)
         self.assertEquals(server_conn.client_random(), client_conn.client_random())

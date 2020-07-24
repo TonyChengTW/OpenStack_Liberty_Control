@@ -77,8 +77,8 @@ class TestRepo(TestBase):
             assert isinstance(head.commit, Commit)
         # END for each head
 
-        assert isinstance(self.rorepo.heads.master, Head)
-        assert isinstance(self.rorepo.heads['master'], Head)
+        assert isinstance(self.rorepo.heads.main, Head)
+        assert isinstance(self.rorepo.heads['main'], Head)
 
     def test_tree_from_revision(self):
         tree = self.rorepo.tree('0.1.6')
@@ -276,7 +276,7 @@ class TestRepo(TestBase):
     @patch.object(Git, '_call_process')
     def test_should_display_blame_information(self, git):
         git.return_value = fixture('blame')
-        b = self.rorepo.blame('master', 'lib/git.py')
+        b = self.rorepo.blame('main', 'lib/git.py')
         assert_equal(13, len(b))
         assert_equal(2, len(b[0]))
         # assert_equal(25, reduce(lambda acc, x: acc + len(x[-1]), b))
@@ -301,7 +301,7 @@ class TestRepo(TestBase):
 
         # BINARY BLAME
         git.return_value = fixture('blame_binary')
-        blames = self.rorepo.blame('master', 'rps')
+        blames = self.rorepo.blame('main', 'rps')
         assert len(blames) == 2
 
     def test_blame_real(self):
@@ -710,7 +710,7 @@ class TestRepo(TestBase):
         for i in range(64):
             for repo_type in (GitCmdObjectDB, GitDB):
                 repo = Repo(self.rorepo.working_tree_dir, odbt=repo_type)
-                last_commit(repo, 'master', 'git/test/test_base.py')
+                last_commit(repo, 'main', 'git/test/test_base.py')
             # end for each repository type
         # end for each iteration
 
@@ -724,13 +724,13 @@ class TestRepo(TestBase):
         r = Repo.init(rw_dir, mkdir=False)
         # It's ok not to be able to iterate a commit, as there is none
         self.failUnlessRaises(ValueError, r.iter_commits)
-        assert r.active_branch.name == 'master'
+        assert r.active_branch.name == 'main'
         assert not r.active_branch.is_valid(), "Branch is yet to be born"
 
         # actually, when trying to create a new branch without a commit, git itself fails
         # We should, however, not fail ungracefully
         self.failUnlessRaises(BadName, r.create_head, 'foo')
-        self.failUnlessRaises(BadName, r.create_head, 'master')
+        self.failUnlessRaises(BadName, r.create_head, 'main')
         # It's expected to not be able to access a tree
         self.failUnlessRaises(ValueError, r.tree)
 

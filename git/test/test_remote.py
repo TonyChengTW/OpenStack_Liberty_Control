@@ -165,8 +165,8 @@ class TestRemote(TestBase):
         def get_info(res, remote, name):
             return res["%s/%s" % (remote, name)]
 
-        # put remote head to master as it is guaranteed to exist
-        remote_repo.head.reference = remote_repo.heads.master
+        # put remote head to main as it is guaranteed to exist
+        remote_repo.head.reference = remote_repo.heads.main
 
         res = fetch_and_test(remote)
         # all up to date
@@ -179,9 +179,9 @@ class TestRemote(TestBase):
         remote_commit = rhead.commit
         rhead.reset("HEAD~2", index=False)
         res = fetch_and_test(remote)
-        mkey = "%s/%s" % (remote, 'master')
-        master_info = res[mkey]
-        assert master_info.flags & FetchInfo.FORCED_UPDATE and master_info.note is not None
+        mkey = "%s/%s" % (remote, 'main')
+        main_info = res[mkey]
+        assert main_info.flags & FetchInfo.FORCED_UPDATE and main_info.note is not None
 
         # normal fast forward - set head back to previous one
         rhead.commit = remote_commit
@@ -212,16 +212,16 @@ class TestRemote(TestBase):
         RemoteReference.delete(rw_repo, *stale_refs)
 
         # test single branch fetch with refspec including target remote
-        res = fetch_and_test(remote, refspec="master:refs/remotes/%s/master" % remote)
-        assert len(res) == 1 and get_info(res, remote, 'master')
+        res = fetch_and_test(remote, refspec="main:refs/remotes/%s/main" % remote)
+        assert len(res) == 1 and get_info(res, remote, 'main')
 
         # ... with respec and no target
-        res = fetch_and_test(remote, refspec='master')
+        res = fetch_and_test(remote, refspec='main')
         assert len(res) == 1
 
         # ... multiple refspecs ... works, but git command returns with error if one ref is wrong without
         # doing anything. This is new in  later binaries
-        # res = fetch_and_test(remote, refspec=['master', 'fred'])
+        # res = fetch_and_test(remote, refspec=['main', 'fred'])
         # assert len(res) == 1
 
         # add new tag reference
@@ -261,7 +261,7 @@ class TestRemote(TestBase):
         # assert not other_repo.alternates  # this would fail
 
         # assure we are in the right state
-        rw_repo.head.reset(remote.refs.master, working_tree=True)
+        rw_repo.head.reset(remote.refs.main, working_tree=True)
         try:
             self._commit_random_file(rw_repo)
             remote.push(rw_repo.head.reference)
@@ -278,15 +278,15 @@ class TestRemote(TestBase):
     def _assert_push_and_pull(self, remote, rw_repo, remote_repo):
         # push our changes
         lhead = rw_repo.head
-        # assure we are on master and it is checked out where the remote is
+        # assure we are on main and it is checked out where the remote is
         try:
-            lhead.reference = rw_repo.heads.master
+            lhead.reference = rw_repo.heads.main
         except AttributeError:
-            # if the author is on a non-master branch, the clones might not have
-            # a local master yet. We simply create it
-            lhead.reference = rw_repo.create_head('master')
-        # END master handling
-        lhead.reset(remote.refs.master, working_tree=True)
+            # if the author is on a non-main branch, the clones might not have
+            # a local main yet. We simply create it
+            lhead.reference = rw_repo.create_head('main')
+        # END main handling
+        lhead.reset(remote.refs.main, working_tree=True)
 
         # push without spec should fail ( without further configuration )
         # well, works nicely
@@ -364,7 +364,7 @@ class TestRemote(TestBase):
         res = remote.push(all=True)
         self._do_test_push_result(res, remote)
 
-        remote.pull('master')
+        remote.pull('main')
 
         # cleanup - delete created tags and branches as we are in an innerloop on
         # the same repository
@@ -448,20 +448,20 @@ class TestRemote(TestBase):
         # Verify we can handle prunes when fetching
         # stderr lines look like this:  x [deleted]         (none)     -> origin/experiment-2012
         # These should just be skipped
-        # If we don't have a manual checkout, we can't actually assume there are any non-master branches
+        # If we don't have a manual checkout, we can't actually assume there are any non-main branches
         remote_repo.create_head("myone_for_deletion")
         # Get the branch - to be pruned later
         origin.fetch()
 
         num_deleted = False
         for branch in remote_repo.heads:
-            if branch.name != 'master':
+            if branch.name != 'main':
                 branch.delete(remote_repo, branch, force=True)
                 num_deleted += 1
             # end
         # end for each branch
         assert num_deleted > 0
-        assert len(rw_repo.remotes.origin.fetch(prune=True)) == 1, "deleted everything but master"
+        assert len(rw_repo.remotes.origin.fetch(prune=True)) == 1, "deleted everything but main"
 
     @with_rw_repo('HEAD', bare=True)
     def test_creation_and_removal(self, bare_rw_repo):
@@ -495,10 +495,10 @@ class TestRemote(TestBase):
         fetch_info_line_fmt += "git://github.com/gitpython-developers/GitPython"
         remote_info_line_fmt = "* [new branch]      nomatter     -> %s"
         fi = FetchInfo._from_line(self.rorepo,
-                                  remote_info_line_fmt % "local/master",
+                                  remote_info_line_fmt % "local/main",
                                   fetch_info_line_fmt % 'remote-tracking branch')
         assert not fi.ref.is_valid()
-        assert fi.ref.name == "local/master"
+        assert fi.ref.name == "local/main"
 
         # handles non-default refspecs: One can specify a different path in refs/remotes
         # or a special path just in refs/something for instance

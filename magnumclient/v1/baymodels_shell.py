@@ -63,9 +63,9 @@ def _show_baymodel(baymodel):
            metavar='<flavor-id>',
            default='m1.medium',
            help='The nova flavor id to use when launching the bay.')
-@utils.arg('--master-flavor-id',
-           metavar='<master-flavor-id>',
-           help='The nova flavor id to use when launching the master node '
+@utils.arg('--main-flavor-id',
+           metavar='<main-flavor-id>',
+           help='The nova flavor id to use when launching the main node '
            'of the bay.')
 @utils.arg('--docker-volume-size',
            metavar='<docker-volume-size>',
@@ -96,7 +96,7 @@ def do_baymodel_create(cs, args):
     opts = {}
     opts['name'] = args.name
     opts['flavor_id'] = args.flavor_id
-    opts['master_flavor_id'] = args.master_flavor_id
+    opts['main_flavor_id'] = args.main_flavor_id
     opts['image_id'] = args.image_id
     opts['keypair_id'] = args.keypair_id
     opts['external_network_id'] = args.external_network_id

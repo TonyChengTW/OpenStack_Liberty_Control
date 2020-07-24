@@ -271,7 +271,7 @@ class _TestServiceObject(object):
                          objects.Service.get_minimum_version(self.context,
                                                              'nova-compute'))
         mock_get.assert_called_once_with(self.context, 'nova-compute',
-                                         use_slave=False)
+                                         use_subordinate=False)
 
     @mock.patch('nova.db.service_get_minimum_version')
     def test_get_minimum_version(self, mock_get):
@@ -280,7 +280,7 @@ class _TestServiceObject(object):
                          objects.Service.get_minimum_version(self.context,
                                                              'nova-compute'))
         mock_get.assert_called_once_with(self.context, 'nova-compute',
-                                         use_slave=False)
+                                         use_subordinate=False)
 
     @mock.patch('nova.db.service_get_minimum_version')
     @mock.patch('nova.objects.service.LOG')
@@ -309,7 +309,7 @@ class _TestServiceObject(object):
                          objects.Service.get_minimum_version(self.context,
                                                              'nova-compute'))
         mock_get.assert_called_once_with(self.context, 'nova-compute',
-                                         use_slave=False)
+                                         use_subordinate=False)
         objects.Service._SERVICE_VERSION_CACHING = False
         objects.Service.clear_min_version_cache()
 

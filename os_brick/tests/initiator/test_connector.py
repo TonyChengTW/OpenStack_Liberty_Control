@@ -1807,7 +1807,7 @@ class HGSTConnectorTestCase(ConnectorTestCase):
        valid_lft forever preferred_lft forever
     inet6 ::1/128 scope host
        valid_lft forever preferred_lft forever
-2: em1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq master
+2: em1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq main
     link/ether 00:25:90:d9:18:08 brd ff:ff:ff:ff:ff:ff
     inet6 fe80::225:90ff:fed9:1808/64 scope link
        valid_lft forever preferred_lft forever

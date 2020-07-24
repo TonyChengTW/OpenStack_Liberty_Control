@@ -626,8 +626,8 @@ class IterableList(list):
     List of iterable objects allowing to query an object by id or by named index::
 
      heads = repo.heads
-     heads.master
-     heads['master']
+     heads.main
+     heads['main']
      heads[0]
 
     It requires an id_attribute name to be set which will be queried from its

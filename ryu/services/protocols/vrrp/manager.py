@@ -172,10 +172,10 @@ class VRRPStatistics(object):
         self.tx_vrrp_zero_prio_packets = 0
         self.rx_vrrp_invalid_packets = 0
         self.rx_vrrp_bad_auth = 0
-        self.idle_to_master_transitions = 0
+        self.idle_to_main_transitions = 0
         self.idle_to_backup_transitions = 0
-        self.backup_to_master_transitions = 0
-        self.master_to_backup_transitions = 0
+        self.backup_to_main_transitions = 0
+        self.main_to_backup_transitions = 0
 
     def get_stats(self):
         ts = time.strftime("%Y-%m-%dT%H:%M:%S")
@@ -188,9 +188,9 @@ class VRRPStatistics(object):
             tx_vrrp_zero_prio_packets=self.tx_vrrp_zero_prio_packets,
             rx_vrrp_invalid_packets=self.rx_vrrp_invalid_packets,
             rx_vrrp_bad_auth=self.rx_vrrp_bad_auth,
-            idle_to_master_transitions=self.idle_to_master_transitions,
+            idle_to_main_transitions=self.idle_to_main_transitions,
             idle_to_backup_transitions=self.idle_to_backup_transitions,
-            backup_to_master_transitions=self.backup_to_master_transitions,
-            master_to_backup_transitions=self.master_to_backup_transitions
+            backup_to_main_transitions=self.backup_to_main_transitions,
+            main_to_backup_transitions=self.main_to_backup_transitions
         )
         return stats_dict

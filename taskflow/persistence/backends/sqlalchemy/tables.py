@@ -35,7 +35,7 @@ VERSION_LENGTH = 64
 
 
 def fetch(metadata):
-    """Returns the master set of table objects (which is also there schema)."""
+    """Returns the main set of table objects (which is also there schema)."""
     logbooks = Table('logbooks', metadata,
                      Column('created_at', DateTime,
                             default=timeutils.utcnow),

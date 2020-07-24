@@ -15,7 +15,7 @@
 """Represent one server in the topology."""
 
 from pymongo.server_type import SERVER_TYPE
-from pymongo.ismaster import IsMaster
+from pymongo.ismain import IsMain
 
 
 class ServerDescription(object):
@@ -23,7 +23,7 @@ class ServerDescription(object):
 
     :Parameters:
       - `address`: A (host, port) pair
-      - `ismaster`: Optional IsMaster instance
+      - `ismain`: Optional IsMain instance
       - `round_trip_time`: Optional float
       - `error`: Optional, the last error attempting to connect to the server
     """
@@ -38,28 +38,28 @@ class ServerDescription(object):
     def __init__(
             self,
             address,
-            ismaster=None,
+            ismain=None,
             round_trip_time=None,
             error=None):
         self._address = address
-        if not ismaster:
-            ismaster = IsMaster({})
+        if not ismain:
+            ismain = IsMain({})
 
-        self._server_type = ismaster.server_type
-        self._all_hosts = ismaster.all_hosts
-        self._tags = ismaster.tags
-        self._replica_set_name = ismaster.replica_set_name
-        self._primary = ismaster.primary
-        self._max_bson_size = ismaster.max_bson_size
-        self._max_message_size = ismaster.max_message_size
-        self._max_write_batch_size = ismaster.max_write_batch_size
-        self._min_wire_version = ismaster.min_wire_version
-        self._max_wire_version = ismaster.max_wire_version
-        self._election_id = ismaster.election_id
-        self._is_writable = ismaster.is_writable
-        self._is_readable = ismaster.is_readable
+        self._server_type = ismain.server_type
+        self._all_hosts = ismain.all_hosts
+        self._tags = ismain.tags
+        self._replica_set_name = ismain.replica_set_name
+        self._primary = ismain.primary
+        self._max_bson_size = ismain.max_bson_size
+        self._max_message_size = ismain.max_message_size
+        self._max_write_batch_size = ismain.max_write_batch_size
+        self._min_wire_version = ismain.min_wire_version
+        self._max_wire_version = ismain.max_wire_version
+        self._election_id = ismain.election_id
+        self._is_writable = ismain.is_writable
+        self._is_readable = ismain.is_readable
         self._round_trip_time = round_trip_time
-        self._me = ismaster.me
+        self._me = ismain.me
         self._error = error
 
     @property

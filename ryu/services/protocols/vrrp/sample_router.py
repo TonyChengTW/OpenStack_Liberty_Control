@@ -67,8 +67,8 @@ class RouterBase(app_manager.RyuApp):
     def _initialized(self):
         self.logger.debug('initialized')
 
-    def _initialized_to_master(self):
-        self.logger.debug('initialized to master')
+    def _initialized_to_main(self):
+        self.logger.debug('initialized to main')
         # RFC3768 6.4.1
         # o  Broadcast a gratuitous ARP request containing the virtual
         # router MAC address for each IP address associated with the
@@ -89,8 +89,8 @@ class RouterBase(app_manager.RyuApp):
         #   address of the virtual router, and the target link-layer
         #   address set to the virtual router MAC address.
 
-    def _become_master(self):
-        self.logger.debug('become master')
+    def _become_main(self):
+        self.logger.debug('become main')
         # RFC3768 6.4.2
         # o  Broadcast a gratuitous ARP request containing the virtual
         #    router MAC address for each IP address associated with the
@@ -151,9 +151,9 @@ class RouterBase(app_manager.RyuApp):
         self.logger.debug('sample router %s -> %s', old_state, new_state)
         if new_state == vrrp_event.VRRP_STATE_MASTER:
             if old_state == vrrp_event.VRRP_STATE_INITIALIZE:
-                self._initialized_to_master()
+                self._initialized_to_main()
             elif old_state == vrrp_event.VRRP_STATE_BACKUP:
-                self._become_master()
+                self._become_main()
 
             # RFC 3768 6.4.3
             # -  MUST respond to ARP requests for the IP address(es) associated
@@ -292,29 +292,29 @@ class RouterIPV4Linux(RouterIPV4):
         super(RouterIPV4Linux, self).__init__(*args, **kwargs)
         assert isinstance(self.interface,
                           vrrp_event.VRRPInterfaceNetworkDevice)
-        self.__is_master = False
+        self.__is_main = False
         self._arp_thread = None
 
     def start(self):
         self._disable_router()
         super(RouterIPV4Linux, self).start()
 
-    def _initialized_to_master(self):
-        self.logger.debug('initialized to master')
-        self._master()
+    def _initialized_to_main(self):
+        self.logger.debug('initialized to main')
+        self._main()
 
-    def _become_master(self):
-        self.logger.debug('become master')
-        self._master()
+    def _become_main(self):
+        self.logger.debug('become main')
+        self._main()
 
-    def _master(self):
-        self.__is_master = True
+    def _main(self):
+        self.__is_main = True
         self._enable_router()
         self._send_garp()
 
     def _become_backup(self):
         self.logger.debug('become backup')
-        self.__is_master = False
+        self.__is_main = False
         self._disable_router()
 
     def _shutdowned(self):
@@ -404,15 +404,15 @@ class RouterIPV4OpenFlow(RouterIPV4):
         self._install_route_rule(dp)
         super(RouterIPV4OpenFlow, self).start()
 
-    def _initialized_to_master(self):
-        self.logger.debug('initialized to master')
-        self._master()
+    def _initialized_to_main(self):
+        self.logger.debug('initialized to main')
+        self._main()
 
-    def _become_master(self):
-        self.logger.debug('become master')
-        self._master()
+    def _become_main(self):
+        self.logger.debug('become main')
+        self._main()
 
-    def _master(self):
+    def _main(self):
         dp = self._get_dp()
         if dp is None:
             return

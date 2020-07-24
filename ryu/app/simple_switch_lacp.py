@@ -34,7 +34,7 @@ class SimpleSwitchLacp(app_manager.RyuApp):
         self._lacp = kwargs['lacplib']
         # in this sample application, bonding i/fs of the switchs
         # shall be set up as follows:
-        # - the port 1 and 2 of the datapath 1 face the slave i/fs.
+        # - the port 1 and 2 of the datapath 1 face the subordinate i/fs.
         # - the port 3, 4 and 5 of the datapath 1 face the others.
         # - the port 1 and 2 of the datapath 2 face the others.
         self._lacp.add(
@@ -101,13 +101,13 @@ class SimpleSwitchLacp(app_manager.RyuApp):
             actions=actions)
         datapath.send_msg(out)
 
-    @set_ev_cls(lacplib.EventSlaveStateChanged, MAIN_DISPATCHER)
-    def _slave_state_changed_handler(self, ev):
+    @set_ev_cls(lacplib.EventSubordinateStateChanged, MAIN_DISPATCHER)
+    def _subordinate_state_changed_handler(self, ev):
         datapath = ev.datapath
         dpid = datapath.id
         port_no = ev.port
         enabled = ev.enabled
-        self.logger.info("slave state changed port: %d enabled: %s",
+        self.logger.info("subordinate state changed port: %d enabled: %s",
                          port_no, enabled)
         if dpid in self.mac_to_port:
             for mac in self.mac_to_port[dpid]:

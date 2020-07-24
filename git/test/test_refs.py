@@ -500,7 +500,7 @@ class TestRefs(TestBase):
 
         # reattach head - head will not be returned if it is not a symbolic
         # ref
-        rw_repo.head.reference = Head.create(rw_repo, "master")
+        rw_repo.head.reference = Head.create(rw_repo, "main")
 
         # At least the head should still exist
         assert os.path.isfile(os.path.join(rw_repo.git_dir, 'HEAD'))
@@ -548,4 +548,4 @@ class TestRefs(TestBase):
         assert SymbolicReference.dereference_recursive(self.rorepo, 'HEAD')
 
     def test_reflog(self):
-        assert isinstance(self.rorepo.heads.master.log(), RefLog)
+        assert isinstance(self.rorepo.heads.main.log(), RefLog)

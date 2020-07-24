@@ -38,22 +38,22 @@ class TestRefLog(TestBase):
 
     def test_base(self):
         rlp_head = fixture_path('reflog_HEAD')
-        rlp_master = fixture_path('reflog_master')
+        rlp_main = fixture_path('reflog_main')
         tdir = tempfile.mktemp(suffix="test_reflogs")
         os.mkdir(tdir)
 
-        rlp_master_ro = RefLog.path(self.rorepo.head)
-        assert os.path.isfile(rlp_master_ro)
+        rlp_main_ro = RefLog.path(self.rorepo.head)
+        assert os.path.isfile(rlp_main_ro)
 
         # simple read
-        reflog = RefLog.from_file(rlp_master_ro)
+        reflog = RefLog.from_file(rlp_main_ro)
         assert reflog._path is not None
         assert isinstance(reflog, RefLog)
         assert len(reflog)
 
         # iter_entries works with path and with stream
-        assert len(list(RefLog.iter_entries(open(rlp_master, 'rb'))))
-        assert len(list(RefLog.iter_entries(rlp_master)))
+        assert len(list(RefLog.iter_entries(open(rlp_main, 'rb'))))
+        assert len(list(RefLog.iter_entries(rlp_main)))
 
         # raise on invalid revlog
         # TODO: Try multiple corrupted ones !
@@ -69,7 +69,7 @@ class TestRefLog(TestBase):
         binsha = hex_to_bin(('f' * 40).encode('ascii'))
         msg = "my reflog message"
         cr = self.rorepo.config_reader()
-        for rlp in (rlp_head, rlp_master):
+        for rlp in (rlp_head, rlp_main):
             reflog = RefLog.from_file(rlp)
             tfile = os.path.join(tdir, os.path.basename(rlp))
             reflog.to_file(tfile)

@@ -277,7 +277,7 @@ class FakeImageService(object):
         self.authtoken = authtoken
 
     def get_images(self):
-        if self.authtoken == 'livemastertoken':
+        if self.authtoken == 'livemaintoken':
             return FAKEIMAGES_LIVEMASTER
         return FAKEIMAGES
 
@@ -336,7 +336,7 @@ def check_bad_args(command, args):
 class ReplicationCommandsTestCase(test_utils.BaseTestCase):
     def test_replication_size(self):
         options = moves.UserDict()
-        options.slavetoken = 'slavetoken'
+        options.subordinatetoken = 'subordinatetoken'
         args = ['localhost:9292']
 
         stdout = sys.stdout
@@ -369,7 +369,7 @@ class ReplicationCommandsTestCase(test_utils.BaseTestCase):
 
         options = moves.UserDict()
         options.chunksize = 4096
-        options.mastertoken = 'mastertoken'
+        options.maintoken = 'maintoken'
         options.metaonly = False
         args = ['localhost:9292', tempdir]
 
@@ -456,7 +456,7 @@ class ReplicationCommandsTestCase(test_utils.BaseTestCase):
         # Finally, we're ready to test
         options = moves.UserDict()
         options.dontreplicate = 'dontrepl dontreplabsent'
-        options.slavetoken = 'slavetoken'
+        options.subordinatetoken = 'subordinatetoken'
         args = ['localhost:9292', tempdir]
 
         orig_img_service = glance_replicator.get_image_service
@@ -485,8 +485,8 @@ class ReplicationCommandsTestCase(test_utils.BaseTestCase):
         options = moves.UserDict()
         options.chunksize = 4096
         options.dontreplicate = 'dontrepl dontreplabsent'
-        options.mastertoken = 'livemastertoken'
-        options.slavetoken = 'liveslavetoken'
+        options.maintoken = 'livemaintoken'
+        options.subordinatetoken = 'livesubordinatetoken'
         options.metaonly = False
         args = ['localhost:9292', 'localhost:9393']
 
@@ -513,8 +513,8 @@ class ReplicationCommandsTestCase(test_utils.BaseTestCase):
         options = moves.UserDict()
         options.chunksize = 4096
         options.dontreplicate = 'dontrepl dontreplabsent'
-        options.mastertoken = 'livemastertoken'
-        options.slavetoken = 'liveslavetoken'
+        options.maintoken = 'livemaintoken'
+        options.subordinatetoken = 'livesubordinatetoken'
         options.metaonly = False
         args = ['localhost:9292', 'localhost:9393']
 

@@ -66,7 +66,7 @@ class TestZones(v2.APIV2TestCase, v2.CrudMixin):
         self.assertRequestBodyIs(json=values)
 
     def test_create_secondary(self):
-        ref = self.new_ref(type="SECONDARY", masters=["10.0.0.1"])
+        ref = self.new_ref(type="SECONDARY", mains=["10.0.0.1"])
         self.stub_url("POST", parts=[self.RESOURCE], json=ref)
 
         values = ref.copy()
@@ -75,7 +75,7 @@ class TestZones(v2.APIV2TestCase, v2.CrudMixin):
         self.client.zones.create(
             values["name"],
             type_=values["type"],
-            masters=values["masters"])
+            mains=values["mains"])
         self.assertRequestBodyIs(json=values)
 
     def test_get(self):

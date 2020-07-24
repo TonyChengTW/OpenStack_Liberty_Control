@@ -71,11 +71,11 @@ class PartitionCoordinator(object):
 
     All available partitions report their presence periodically.
 
-    The priority of each partition in terms of assuming mastership
+    The priority of each partition in terms of assuming mainship
     is determined by earliest start-time (with a UUID-based tiebreaker
     in the unlikely event of a time clash).
 
-    A single partition assumes mastership at any given time, taking
+    A single partition assumes mainship at any given time, taking
     responsibility for allocating the alarms to be evaluated across
     the set of currently available partitions.
 
@@ -94,7 +94,7 @@ class PartitionCoordinator(object):
 
     As presence reports are received, each partition keeps track of the
     oldest partition it currently knows about, allowing an assumption of
-    mastership to be aborted if an older partition belatedly reports.
+    mainship to be aborted if an older partition belatedly reports.
     """
 
     def __init__(self):
@@ -108,8 +108,8 @@ class PartitionCoordinator(object):
         # fan-out RPC
         self.coordination_rpc = rpc_alarm.RPCAlarmPartitionCoordination()
 
-        # state maintained by the master
-        self.is_master = False
+        # state maintained by the main
+        self.is_main = False
         self.presence_changed = False
         self.reports = {}
         self.last_alarms = set()
@@ -135,7 +135,7 @@ class PartitionCoordinator(object):
                             float(len(self.reports) + 1)))
         LOG.debug(_('per evaluator allocation %s') % per_evaluator)
         # for small distributions (e.g. of newly created alarms)
-        # we deliberately skew to non-master evaluators
+        # we deliberately skew to non-main evaluators
         evaluators = self.reports.keys()
         random.shuffle(evaluators)
         offset = 0
@@ -153,7 +153,7 @@ class PartitionCoordinator(object):
                           dict(verb=verb, alloc=allocation, eval=evaluator))
                 method(evaluator.uuid, allocation)
             offset += per_evaluator
-        LOG.debug(_('master taking %s for self') % alarms[offset:])
+        LOG.debug(_('main taking %s for self') % alarms[offset:])
         if rebalance:
             self.assignment = alarms[offset:]
         else:
@@ -195,13 +195,13 @@ class PartitionCoordinator(object):
             # new oldest
             self.oldest = partition
 
-    def _is_master(self, interval):
-        """Determine if the current partition is the master."""
+    def _is_main(self, interval):
+        """Determine if the current partition is the main."""
         now = timeutils.utcnow()
         if timeutils.delta_seconds(self.start, now) < interval * 2:
             LOG.debug(_('%s still warming up') % self.this)
             return False
-        is_master = True
+        is_main = True
         for partition, last_heard in self.reports.items():
             delta = timeutils.delta_seconds(last_heard, now)
             LOG.debug(_('last heard from %(report)s %(delta)s seconds ago') %
@@ -213,17 +213,17 @@ class PartitionCoordinator(object):
                           dict(this=self.this, stale=partition))
                 self.presence_changed = True
             elif partition < self.this:
-                is_master = False
-                LOG.info(_('%(this)s sees older potential master: %(older)s')
+                is_main = False
+                LOG.info(_('%(this)s sees older potential main: %(older)s')
                          % dict(this=self.this, older=partition))
-        LOG.info(_('%(this)s is master?: %(is_master)s') %
-                 dict(this=self.this, is_master=is_master))
-        return is_master
+        LOG.info(_('%(this)s is main?: %(is_main)s') %
+                 dict(this=self.this, is_main=is_main))
+        return is_main
 
-    def _master_role(self, assuming, api_client):
-        """Carry out the master role, initiating a distribution if required.
+    def _main_role(self, assuming, api_client):
+        """Carry out the main role, initiating a distribution if required.
 
-        :param assuming: true if newly assumed mastership
+        :param assuming: true if newly assumed mainship
         :param api_client: the API client to use for alarms.
         :return: True if not overtaken by an older partition
         """
@@ -240,24 +240,24 @@ class PartitionCoordinator(object):
             # nothing to distribute, but check anyway if overtaken
             still_ahead = self.this < self.oldest
         self.last_alarms = set(alarms)
-        LOG.info(_('%(this)s not overtaken as master? %(still_ahead)s') %
+        LOG.info(_('%(this)s not overtaken as main? %(still_ahead)s') %
                  ({'this': self.this, 'still_ahead': still_ahead}))
         return still_ahead
 
-    def check_mastership(self, eval_interval, api_client):
-        """Periodically check if the mastership role should be assumed.
+    def check_mainship(self, eval_interval, api_client):
+        """Periodically check if the mainship role should be assumed.
 
         :param eval_interval: the alarm evaluation interval
         :param api_client: the API client to use for alarms.
         """
-        LOG.debug(_('%s checking mastership status') % self.this)
+        LOG.debug(_('%s checking mainship status') % self.this)
         try:
-            assuming = not self.is_master
-            self.is_master = (self._is_master(eval_interval) and
-                              self._master_role(assuming, api_client))
+            assuming = not self.is_main
+            self.is_main = (self._is_main(eval_interval) and
+                              self._main_role(assuming, api_client))
             self.presence_changed = False
         except Exception:
-            LOG.exception(_('mastership check failed'))
+            LOG.exception(_('mainship check failed'))
 
     def presence(self, uuid, priority):
         """Accept an incoming report of presence."""

@@ -364,13 +364,13 @@ class Instance(base.NovaPersistentObject, base.NovaObject,
         return instance
 
     @base.remotable_classmethod
-    def get_by_uuid(cls, context, uuid, expected_attrs=None, use_slave=False):
+    def get_by_uuid(cls, context, uuid, expected_attrs=None, use_subordinate=False):
         if expected_attrs is None:
             expected_attrs = ['info_cache', 'security_groups']
         columns_to_join = _expected_cols(expected_attrs)
         db_inst = db.instance_get_by_uuid(context, uuid,
                                           columns_to_join=columns_to_join,
-                                          use_slave=use_slave)
+                                          use_subordinate=use_subordinate)
         return cls._from_db_object(context, cls(), db_inst,
                                    expected_attrs)
 
@@ -689,12 +689,12 @@ class Instance(base.NovaPersistentObject, base.NovaObject,
         self.obj_reset_changes()
 
     @base.remotable
-    def refresh(self, use_slave=False):
+    def refresh(self, use_subordinate=False):
         extra = [field for field in INSTANCE_OPTIONAL_ATTRS
                        if self.obj_attr_is_set(field)]
         current = self.__class__.get_by_uuid(self._context, uuid=self.uuid,
                                              expected_attrs=extra,
-                                             use_slave=use_slave)
+                                             use_subordinate=use_subordinate)
         # NOTE(danms): We orphan the instance copy so we do not unexpectedly
         # trigger a lazy-load (which would mean we failed to calculate the
         # expected_attrs properly)
@@ -978,26 +978,26 @@ class InstanceList(base.ObjectListBase, base.NovaObject):
     @base.remotable_classmethod
     def get_by_filters(cls, context, filters,
                        sort_key='created_at', sort_dir='desc', limit=None,
-                       marker=None, expected_attrs=None, use_slave=False,
+                       marker=None, expected_attrs=None, use_subordinate=False,
                        sort_keys=None, sort_dirs=None):
         if sort_keys or sort_dirs:
             db_inst_list = db.instance_get_all_by_filters_sort(
                 context, filters, limit=limit, marker=marker,
                 columns_to_join=_expected_cols(expected_attrs),
-                use_slave=use_slave, sort_keys=sort_keys, sort_dirs=sort_dirs)
+                use_subordinate=use_subordinate, sort_keys=sort_keys, sort_dirs=sort_dirs)
         else:
             db_inst_list = db.instance_get_all_by_filters(
                 context, filters, sort_key, sort_dir, limit=limit,
                 marker=marker, columns_to_join=_expected_cols(expected_attrs),
-                use_slave=use_slave)
+                use_subordinate=use_subordinate)
         return _make_instance_list(context, cls(), db_inst_list,
                                    expected_attrs)
 
     @base.remotable_classmethod
-    def get_by_host(cls, context, host, expected_attrs=None, use_slave=False):
+    def get_by_host(cls, context, host, expected_attrs=None, use_subordinate=False):
         db_inst_list = db.instance_get_all_by_host(
             context, host, columns_to_join=_expected_cols(expected_attrs),
-            use_slave=use_slave)
+            use_subordinate=use_subordinate)
         return _make_instance_list(context, cls(), db_inst_list,
                                    expected_attrs)
 
@@ -1037,7 +1037,7 @@ class InstanceList(base.ObjectListBase, base.NovaObject):
     def _get_active_by_window_joined(cls, context, begin, end=None,
                                     project_id=None, host=None,
                                     expected_attrs=None,
-                                    use_slave=False):
+                                    use_subordinate=False):
         # NOTE(mriedem): We need to convert the begin/end timestamp strings
         # to timezone-aware datetime objects for the DB API call.
         begin = timeutils.parse_isotime(begin)
@@ -1052,7 +1052,7 @@ class InstanceList(base.ObjectListBase, base.NovaObject):
     def get_active_by_window_joined(cls, context, begin, end=None,
                                     project_id=None, host=None,
                                     expected_attrs=None,
-                                    use_slave=False):
+                                    use_subordinate=False):
         """Get instances and joins active during a certain time window.
 
         :param:context: nova request context
@@ -1062,7 +1062,7 @@ class InstanceList(base.ObjectListBase, base.NovaObject):
         :param:host: used to filter instances on a given compute host
         :param:expected_attrs: list of related fields that can be joined
         in the database layer when querying for instances
-        :param use_slave if True, ship this query off to a DB slave
+        :param use_subordinate if True, ship this query off to a DB subordinate
         :returns: InstanceList
 
         """
@@ -1073,7 +1073,7 @@ class InstanceList(base.ObjectListBase, base.NovaObject):
         return cls._get_active_by_window_joined(context, begin, end,
                                                 project_id, host,
                                                 expected_attrs,
-                                                use_slave=use_slave)
+                                                use_subordinate=use_subordinate)
 
     @base.remotable_classmethod
     def get_by_security_group_id(cls, context, security_group_id):

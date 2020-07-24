@@ -47,11 +47,11 @@ class Instances(base.ManagerWithFind):
     """Manage :class:`Instance` resources."""
     resource_class = Instance
 
-    # TODO(SlickNik): Remove slave_of param after updating tests to replica_of
+    # TODO(SlickNik): Remove subordinate_of param after updating tests to replica_of
     def create(self, name, flavor_id, volume=None, databases=None, users=None,
                restorePoint=None, availability_zone=None, datastore=None,
                datastore_version=None, nics=None, configuration=None,
-               replica_of=None, slave_of=None, replica_count=None):
+               replica_of=None, subordinate_of=None, replica_count=None):
         """Create (boot) a new instance."""
 
         body = {"instance": {
@@ -79,8 +79,8 @@ class Instances(base.ManagerWithFind):
             body["instance"]["nics"] = nics
         if configuration:
             body["instance"]["configuration"] = configuration
-        if replica_of or slave_of:
-            body["instance"]["replica_of"] = base.getid(replica_of) or slave_of
+        if replica_of or subordinate_of:
+            body["instance"]["replica_of"] = base.getid(replica_of) or subordinate_of
         if replica_count:
             body["instance"]["replica_count"] = replica_count
 
@@ -113,9 +113,9 @@ class Instances(base.ManagerWithFind):
         if name is not None:
             body["instance"]["name"] = name
         if detach_replica_source:
-            # TODO(glucas): Remove slave_of after updating trove
+            # TODO(glucas): Remove subordinate_of after updating trove
             # (see trove.instance.service.InstanceController#edit)
-            body["instance"]["slave_of"] = None
+            body["instance"]["subordinate_of"] = None
             body["instance"]["replica_of"] = None
 
         url = "/instances/%s" % base.getid(instance)

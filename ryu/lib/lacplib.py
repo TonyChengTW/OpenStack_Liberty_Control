@@ -39,12 +39,12 @@ class EventPacketIn(event.EventBase):
         self.msg = msg
 
 
-class EventSlaveStateChanged(event.EventBase):
+class EventSubordinateStateChanged(event.EventBase):
     """a event class that notifies the changes of the statuses of the
-    slave i/fs."""
+    subordinate i/fs."""
     def __init__(self, datapath, port, enabled):
         """initialization."""
-        super(EventSlaveStateChanged, self).__init__()
+        super(EventSubordinateStateChanged, self).__init__()
         self.datapath = datapath
         self.port = port
         self.enabled = enabled
@@ -78,7 +78,7 @@ class LacpLib(app_manager.RyuApp):
         dpid      datapath id.
 
         ports     a list of integer values that means the ports face
-                  with the slave i/fs.
+                  with the subordinate i/fs.
         ========= =====================================================
 
         if you want to use multi LAG, call 'add' method more than once.
@@ -110,7 +110,7 @@ class LacpLib(app_manager.RyuApp):
     @set_ev_cls(ofp_event.EventOFPFlowRemoved, MAIN_DISPATCHER)
     def flow_removed_handler(self, evt):
         """FlowRemoved event handler. when the removed flow entry was
-        for LACP, set the status of the slave i/f to disabled, and
+        for LACP, set the status of the subordinate i/f to disabled, and
         send a event."""
         msg = evt.msg
         datapath = msg.datapath
@@ -128,10 +128,10 @@ class LacpLib(app_manager.RyuApp):
         self.logger.info(
             "SW=%s PORT=%d LACP exchange timeout has occurred.",
             dpid_to_str(dpid), port)
-        self._set_slave_enabled(dpid, port, False)
-        self._set_slave_timeout(dpid, port, 0)
+        self._set_subordinate_enabled(dpid, port, False)
+        self._set_subordinate_timeout(dpid, port, 0)
         self.send_event_to_observers(
-            EventSlaveStateChanged(datapath, port, False))
+            EventSubordinateStateChanged(datapath, port, False))
 
     # -------------------------------------------------------------------
     # PRIVATE METHODS ( RELATED TO LACP )
@@ -152,14 +152,14 @@ class LacpLib(app_manager.RyuApp):
         self.logger.debug(str(req_lacp))
 
         # when LACP arrived at disabled port, update the status of
-        # the slave i/f to enabled, and send a event.
-        if not self._get_slave_enabled(dpid, port):
+        # the subordinate i/f to enabled, and send a event.
+        if not self._get_subordinate_enabled(dpid, port):
             self.logger.info(
-                "SW=%s PORT=%d the slave i/f has just been up.",
+                "SW=%s PORT=%d the subordinate i/f has just been up.",
                 dpid_to_str(dpid), port)
-            self._set_slave_enabled(dpid, port, True)
+            self._set_subordinate_enabled(dpid, port, True)
             self.send_event_to_observers(
-                EventSlaveStateChanged(datapath, port, True))
+                EventSubordinateStateChanged(datapath, port, True))
 
         # set the idle_timeout time using the actor state of the
         # received packet.
@@ -170,13 +170,13 @@ class LacpLib(app_manager.RyuApp):
             idle_timeout = req_lacp.LONG_TIMEOUT_TIME
 
         # when the timeout time has changed, update the timeout time of
-        # the slave i/f and re-enter a flow entry for the packet from
-        # the slave i/f with idle_timeout.
-        if idle_timeout != self._get_slave_timeout(dpid, port):
+        # the subordinate i/f and re-enter a flow entry for the packet from
+        # the subordinate i/f with idle_timeout.
+        if idle_timeout != self._get_subordinate_timeout(dpid, port):
             self.logger.info(
                 "SW=%s PORT=%d the timeout time has changed.",
                 dpid_to_str(dpid), port)
-            self._set_slave_timeout(dpid, port, idle_timeout)
+            self._set_subordinate_timeout(dpid, port, idle_timeout)
             func = self._add_flow.get(ofproto.OFP_VERSION)
             assert func
             func(src, port, idle_timeout, datapath)
@@ -240,38 +240,38 @@ class LacpLib(app_manager.RyuApp):
         self.logger.debug(str(res))
         return res
 
-    def _get_slave_enabled(self, dpid, port):
-        """get whether a slave i/f at some port of some datapath is
+    def _get_subordinate_enabled(self, dpid, port):
+        """get whether a subordinate i/f at some port of some datapath is
         enable or not."""
-        slave = self._get_slave(dpid, port)
-        if slave:
-            return slave['enabled']
+        subordinate = self._get_subordinate(dpid, port)
+        if subordinate:
+            return subordinate['enabled']
         else:
             return False
 
-    def _set_slave_enabled(self, dpid, port, enabled):
-        """set whether a slave i/f at some port of some datapath is
+    def _set_subordinate_enabled(self, dpid, port, enabled):
+        """set whether a subordinate i/f at some port of some datapath is
         enable or not."""
-        slave = self._get_slave(dpid, port)
-        if slave:
-            slave['enabled'] = enabled
+        subordinate = self._get_subordinate(dpid, port)
+        if subordinate:
+            subordinate['enabled'] = enabled
 
-    def _get_slave_timeout(self, dpid, port):
+    def _get_subordinate_timeout(self, dpid, port):
         """get the timeout time at some port of some datapath."""
-        slave = self._get_slave(dpid, port)
-        if slave:
-            return slave['timeout']
+        subordinate = self._get_subordinate(dpid, port)
+        if subordinate:
+            return subordinate['timeout']
         else:
             return 0
 
-    def _set_slave_timeout(self, dpid, port, timeout):
+    def _set_subordinate_timeout(self, dpid, port, timeout):
         """set the timeout time at some port of some datapath."""
-        slave = self._get_slave(dpid, port)
-        if slave:
-            slave['timeout'] = timeout
+        subordinate = self._get_subordinate(dpid, port)
+        if subordinate:
+            subordinate['timeout'] = timeout
 
-    def _get_slave(self, dpid, port):
-        """get slave i/f at some port of some datapath."""
+    def _get_subordinate(self, dpid, port):
+        """get subordinate i/f at some port of some datapath."""
         result = None
         for bond in self._bonds:
             if dpid in bond:
@@ -284,7 +284,7 @@ class LacpLib(app_manager.RyuApp):
     # PRIVATE METHODS ( RELATED TO OPEN FLOW PROTOCOL )
     # -------------------------------------------------------------------
     def _add_flow_v1_0(self, src, port, timeout, datapath):
-        """enter a flow entry for the packet from the slave i/f
+        """enter a flow entry for the packet from the subordinate i/f
         with idle_timeout. for OpenFlow ver1.0."""
         ofproto = datapath.ofproto
         parser = datapath.ofproto_parser
@@ -302,7 +302,7 @@ class LacpLib(app_manager.RyuApp):
         datapath.send_msg(mod)
 
     def _add_flow_v1_2(self, src, port, timeout, datapath):
-        """enter a flow entry for the packet from the slave i/f
+        """enter a flow entry for the packet from the subordinate i/f
         with idle_timeout. for OpenFlow ver1.2 and ver1.3."""
         ofproto = datapath.ofproto
         parser = datapath.ofproto_parser

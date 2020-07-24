@@ -70,7 +70,7 @@ class TestPartitionedAlarmService(tests_base.BaseTestCase):
                           pc.report_presence,
                           0),
                 mock.call(test_interval / 2,
-                          pc.check_mastership,
+                          pc.check_mainship,
                           test_interval,
                           test_interval,
                           self.api_client),

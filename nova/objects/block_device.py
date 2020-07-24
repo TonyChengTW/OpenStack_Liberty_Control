@@ -252,7 +252,7 @@ class BlockDeviceMapping(base.NovaPersistentObject, base.NovaObject,
 class BlockDeviceMappingList(base.ObjectListBase, base.NovaObject):
     # Version 1.0: Initial version
     # Version 1.1: BlockDeviceMapping <= version 1.1
-    # Version 1.2: Added use_slave to get_by_instance_uuid
+    # Version 1.2: Added use_subordinate to get_by_instance_uuid
     # Version 1.3: BlockDeviceMapping <= version 1.2
     # Version 1.4: BlockDeviceMapping <= version 1.3
     # Version 1.5: BlockDeviceMapping <= version 1.4
@@ -288,16 +288,16 @@ class BlockDeviceMappingList(base.ObjectListBase, base.NovaObject):
                 context, cls, bdms, 'instance_uuid')
 
     @base.remotable_classmethod
-    def get_by_instance_uuids(cls, context, instance_uuids, use_slave=False):
+    def get_by_instance_uuids(cls, context, instance_uuids, use_subordinate=False):
         db_bdms = db.block_device_mapping_get_all_by_instance_uuids(
-                context, instance_uuids, use_slave=use_slave)
+                context, instance_uuids, use_subordinate=use_subordinate)
         return base.obj_make_list(
                 context, cls(), objects.BlockDeviceMapping, db_bdms or [])
 
     @base.remotable_classmethod
-    def get_by_instance_uuid(cls, context, instance_uuid, use_slave=False):
+    def get_by_instance_uuid(cls, context, instance_uuid, use_subordinate=False):
         db_bdms = db.block_device_mapping_get_all_by_instance(
-                context, instance_uuid, use_slave=use_slave)
+                context, instance_uuid, use_subordinate=use_subordinate)
         return base.obj_make_list(
                 context, cls(), objects.BlockDeviceMapping, db_bdms or [])
 

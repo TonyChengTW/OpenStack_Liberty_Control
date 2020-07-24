@@ -194,7 +194,7 @@ SWITCH_CONTROLLER = '''
           <controllers>
             <controller operation="merge">
               <id>%(controller_id)s</id>
-              <role>master</role>
+              <role>main</role>
               <ip-address>%(ip)s</ip-address>
               <port>6633</port>
               <protocol>tcp</protocol>

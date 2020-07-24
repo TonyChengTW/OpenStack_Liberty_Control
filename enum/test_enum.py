@@ -623,7 +623,7 @@ class TestEnum(unittest.TestCase):
 
     def test_string_enum(self):
         class SkillLevel(str, Enum):
-            master = 'what is the sound of one hand clapping?'
+            main = 'what is the sound of one hand clapping?'
             journeyman = 'why did the chicken cross the road?'
             apprentice = 'knock, knock!'
         self.assertEqual(SkillLevel.apprentice, 'knock, knock!')

@@ -26,7 +26,7 @@ FAKE = {
     'name': FAKE_NAME,
     'profile_id': 'myserver',
     'index': 1,
-    'role': 'master',
+    'role': 'main',
 }
 
 FAKE_CREATE_RESP = {
@@ -39,7 +39,7 @@ FAKE_CREATE_RESP = {
         'deleted_time': None,
         'updated_time': None,
         'data': {},
-        'role': 'master',
+        'role': 'main',
         'index': 1,
         'init_time': None,
         'metadata': {},

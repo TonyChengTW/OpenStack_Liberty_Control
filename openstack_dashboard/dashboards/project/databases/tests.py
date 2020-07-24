@@ -534,8 +534,8 @@ class DatabaseTests(test.TestCase):
             'flavor': 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
             'network': self.networks.first().id,
             'datastore': 'mysql,5.5',
-            'initial_state': 'master',
-            'master': self.databases.first().id
+            'initial_state': 'main',
+            'main': self.databases.first().id
         }
 
         res = self.client.post(LAUNCH_URL, post)
