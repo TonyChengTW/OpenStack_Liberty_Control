@@ -138,7 +138,7 @@ class SymbolicReference(object):
             value = fp.read().rstrip()
             fp.close()
             # Don't only split on spaces, but on whitespace, which allows to parse lines like
-            # 60b64ef992065e2600bfef6187a97f92398a9144                branch 'master' of git-server:/path/to/repo
+            # 60b64ef992065e2600bfef6187a97f92398a9144                branch 'main' of git-server:/path/to/repo
             tokens = value.split()
             assert(len(tokens) != 0)
         except (OSError, IOError):

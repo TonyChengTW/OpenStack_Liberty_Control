@@ -134,7 +134,7 @@ class _TestMigrationObject(object):
         db.instance_get_by_uuid(ctxt, fake_migration['instance_uuid'],
                                 columns_to_join=['info_cache',
                                                  'security_groups'],
-                                use_slave=False
+                                use_subordinate=False
                                 ).AndReturn(fake_inst)
         mig = migration.Migration._from_db_object(ctxt,
                                                   migration.Migration(),
@@ -154,7 +154,7 @@ class _TestMigrationObject(object):
         self.mox.ReplayAll()
         migrations = (
             migration.MigrationList.get_unconfirmed_by_dest_compute(
-                ctxt, 'window', 'foo', use_slave=False))
+                ctxt, 'window', 'foo', use_subordinate=False))
         self.assertEqual(2, len(migrations))
         for index, db_migration in enumerate(db_migrations):
             self.compare_obj(migrations[index], db_migration)

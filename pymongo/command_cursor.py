@@ -20,7 +20,7 @@ from collections import deque
 
 from bson.py3compat import integer_types
 from pymongo import helpers
-from pymongo.errors import AutoReconnect, NotMasterError, OperationFailure
+from pymongo.errors import AutoReconnect, NotMainError, OperationFailure
 from pymongo.message import _CursorAddress, _GetMore, _convert_exception
 
 
@@ -126,8 +126,8 @@ class CommandCursor(object):
                     duration, exc.details, "getMore", rqst_id, self.__address)
 
             raise
-        except NotMasterError as exc:
-            # Don't send kill cursors to another server after a "not master"
+        except NotMainError as exc:
+            # Don't send kill cursors to another server after a "not main"
             # error. It's completely pointless.
             self.__killed = True
 

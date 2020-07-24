@@ -729,7 +729,7 @@ OFPBRC_BUFFER_EMPTY = 7                 # Specified buffer has already been
 OFPBRC_BUFFER_UNKNOWN = 8               # Specified buffer does not exist.
 OFPBRC_BAD_TABLE_ID = 9                 # Specified table-id invalid or does
                                         # not exist.
-OFPBRC_IS_SLAVE = 10                    # Denied because controller is slave.
+OFPBRC_IS_SLAVE = 10                    # Denied because controller is subordinate.
 OFPBRC_BAD_PORT = 11                    # Invalid port.
 OFPBRC_BAD_PACKET = 12                  # Invalid packet in packet-out
 OFPBRC_MULTIPART_BUFFER_OVERFLOW = 13   # ofp_multipart_request
@@ -1364,7 +1364,7 @@ assert (calcsize(OFP_ERROR_EXPERIMENTER_MSG_PACK_STR) +
 # enum ofp_controller_role
 OFPCR_ROLE_NOCHANGE = 0     # Don't change current role.
 OFPCR_ROLE_EQUAL = 1        # Default role, full access.
-OFPCR_ROLE_MASTER = 2       # Full access, at most one master.
+OFPCR_ROLE_MASTER = 2       # Full access, at most one main.
 OFPCR_ROLE_SLAVE = 3        # Read-only access.
 
 # struct ofp_role_request
@@ -1383,7 +1383,7 @@ assert (calcsize(OFP_ROLE_PROP_EXPERIMENTER_PACK_STR) ==
         OFP_ROLE_PROP_EXPERIMENTER_SIZE)
 
 # enum ofp_controller_role_reason
-OFPCRR_MASTER_REQUEST = 0   # Another controller asked to be master.
+OFPCRR_MASTER_REQUEST = 0   # Another controller asked to be main.
 OFPCRR_CONFIG = 1           # Configuration changed on the switch.
 OFPCRR_EXPERIMENTER = 2     # Experimenter data changed.
 
@@ -1394,20 +1394,20 @@ assert (calcsize(OFP_ROLE_STATUS_PACK_STR) + OFP_HEADER_SIZE ==
         OFP_ROLE_STATUS_SIZE)
 
 # enum ofp_async_config_prop_type
-OFPACPT_PACKET_IN_SLAVE = 0             # Packet-in mask for slave.
-OFPACPT_PACKET_IN_MASTER = 1            # Packet-in mask for master.
-OFPACPT_PORT_STATUS_SLAVE = 2           # Port-status mask for slave.
-OFPACPT_PORT_STATUS_MASTER = 3          # Port-status mask for master.
-OFPACPT_FLOW_REMOVED_SLAVE = 4          # Flow removed mask for slave.
-OFPACPT_FLOW_REMOVED_MASTER = 5         # Flow removed mask for master.
-OFPACPT_ROLE_STATUS_SLAVE = 6           # Role status mask for slave.
-OFPACPT_ROLE_STATUS_MASTER = 7          # Role status mask for master.
-OFPACPT_TABLE_STATUS_SLAVE = 8          # Table status mask for slave.
-OFPACPT_TABLE_STATUS_MASTER = 9         # Table status mask for master.
-OFPACPT_REQUESTFORWARD_SLAVE = 10       # RequestForward mask for slave.
-OFPACPT_REQUESTFORWARD_MASTER = 11      # RequestForward mask for master.
-OFPTFPT_EXPERIMENTER_SLAVE = 0xFFFE     # Experimenter for slave.
-OFPTFPT_EXPERIMENTER_MASTER = 0xFFFF    # Experimenter for master.
+OFPACPT_PACKET_IN_SLAVE = 0             # Packet-in mask for subordinate.
+OFPACPT_PACKET_IN_MASTER = 1            # Packet-in mask for main.
+OFPACPT_PORT_STATUS_SLAVE = 2           # Port-status mask for subordinate.
+OFPACPT_PORT_STATUS_MASTER = 3          # Port-status mask for main.
+OFPACPT_FLOW_REMOVED_SLAVE = 4          # Flow removed mask for subordinate.
+OFPACPT_FLOW_REMOVED_MASTER = 5         # Flow removed mask for main.
+OFPACPT_ROLE_STATUS_SLAVE = 6           # Role status mask for subordinate.
+OFPACPT_ROLE_STATUS_MASTER = 7          # Role status mask for main.
+OFPACPT_TABLE_STATUS_SLAVE = 8          # Table status mask for subordinate.
+OFPACPT_TABLE_STATUS_MASTER = 9         # Table status mask for main.
+OFPACPT_REQUESTFORWARD_SLAVE = 10       # RequestForward mask for subordinate.
+OFPACPT_REQUESTFORWARD_MASTER = 11      # RequestForward mask for main.
+OFPTFPT_EXPERIMENTER_SLAVE = 0xFFFE     # Experimenter for subordinate.
+OFPTFPT_EXPERIMENTER_MASTER = 0xFFFF    # Experimenter for main.
 
 # struct ofp_async_config_prop_reasons
 OFP_ASYNC_CONFIG_PROP_REASONS_PACK_STR = '!HHI'

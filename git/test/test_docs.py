@@ -62,10 +62,10 @@ class Tutorials(TestBase):
         # heads, tags and references
         # heads are branches in git-speak
         # [8-test_init_repo_object]
-        assert repo.head.ref == repo.heads.master                   # head is a symbolic reference pointing to master
+        assert repo.head.ref == repo.heads.main                   # head is a symbolic reference pointing to main
         assert repo.tags['0.3.5'] == repo.tag('refs/tags/0.3.5')    # you can access tags in various ways too
-        assert repo.refs.master == repo.heads['master']             # .refs provides access to all refs, i.e. heads ...
-        assert repo.refs['origin/master'] == repo.remotes.origin.refs.master  # ... remotes ...
+        assert repo.refs.main == repo.heads['main']             # .refs provides access to all refs, i.e. heads ...
+        assert repo.refs['origin/main'] == repo.remotes.origin.refs.main  # ... remotes ...
         assert repo.refs['0.3.5'] == repo.tags['0.3.5']             # ... and tags
         # ![8-test_init_repo_object]
 
@@ -122,10 +122,10 @@ class Tutorials(TestBase):
         assert origin.exists()
         for fetch_info in origin.fetch(progress=MyProgressPrinter()):
             print("Updated %s to %s" % (fetch_info.ref, fetch_info.commit))
-        # create a local branch at the latest fetched master. We specify the name statically, but you have all
+        # create a local branch at the latest fetched main. We specify the name statically, but you have all
         # information to do it programatically as well.
-        bare_master = bare_repo.create_head('master', origin.refs.master)
-        bare_repo.head.set_reference(bare_master)
+        bare_main = bare_repo.create_head('main', origin.refs.main)
+        bare_repo.head.set_reference(bare_main)
         assert not bare_repo.delete_remote(origin).exists()
         # push and pull behave very similarly
         # ![12-test_init_repo_object]
@@ -138,33 +138,33 @@ class Tutorials(TestBase):
         new_file_path = os.path.join(cloned_repo.working_tree_dir, 'my-new-file')
         open(new_file_path, 'wb').close()                             # create new file in working tree
         cloned_repo.index.add([new_file_path])                        # add it to the index
-        # Commit the changes to deviate masters history
+        # Commit the changes to deviate mains history
         cloned_repo.index.commit("Added a new file in the past - for later merege")
 
         # prepare a merge
-        master = cloned_repo.heads.master                         # right-hand side is ahead of us, in the future
-        merge_base = cloned_repo.merge_base(new_branch, master)   # allwos for a three-way merge
-        cloned_repo.index.merge_tree(master, base=merge_base)     # write the merge result into index
+        main = cloned_repo.heads.main                         # right-hand side is ahead of us, in the future
+        merge_base = cloned_repo.merge_base(new_branch, main)   # allwos for a three-way merge
+        cloned_repo.index.merge_tree(main, base=merge_base)     # write the merge result into index
         cloned_repo.index.commit("Merged past and now into future ;)",
-                                 parent_commits=(new_branch.commit, master.commit))
+                                 parent_commits=(new_branch.commit, main.commit))
 
-        # now new_branch is ahead of master, which probably should be checked out and reset softly.
+        # now new_branch is ahead of main, which probably should be checked out and reset softly.
         # note that all these operations didn't touch the working tree, as we managed it ourselves.
         # This definitely requires you to know what you are doing :) !
         assert os.path.basename(new_file_path) in new_branch.commit.tree  # new file is now in tree
-        master.commit = new_branch.commit            # let master point to most recent commit
-        cloned_repo.head.reference = master          # we adjusted just the reference, not the working tree or index
+        main.commit = new_branch.commit            # let main point to most recent commit
+        cloned_repo.head.reference = main          # we adjusted just the reference, not the working tree or index
         # ![13-test_init_repo_object]
 
         # submodules
 
         # [14-test_init_repo_object]
-        # create a new submodule and check it out on the spot, setup to track master branch of `bare_repo`
+        # create a new submodule and check it out on the spot, setup to track main branch of `bare_repo`
         # As our GitPython repository has submodules already that point to github, make sure we don't
         # interact with them
         for sm in cloned_repo.submodules:
             assert not sm.remove().exists()                   # after removal, the sm doesn't exist anymore
-        sm = cloned_repo.create_submodule('mysubrepo', 'path/to/subrepo', url=bare_repo.git_dir, branch='master')
+        sm = cloned_repo.create_submodule('mysubrepo', 'path/to/subrepo', url=bare_repo.git_dir, branch='main')
         
         # .gitmodules was written and added to the index, which is now being committed
         cloned_repo.index.commit("Added submodule")
@@ -181,13 +181,13 @@ class Tutorials(TestBase):
     def test_references_and_objects(self, rw_dir):
         # [1-test_references_and_objects]
         import git
-        repo = git.Repo.clone_from(self._small_repo_url(), os.path.join(rw_dir, 'repo'), branch='master')
+        repo = git.Repo.clone_from(self._small_repo_url(), os.path.join(rw_dir, 'repo'), branch='main')
 
         heads = repo.heads
-        master = heads.master       # lists can be accessed by name for convenience
-        master.commit               # the commit pointed to by head called master
-        master.rename('new_name')   # rename heads
-        master.rename('master')
+        main = heads.main       # lists can be accessed by name for convenience
+        main.commit               # the commit pointed to by head called main
+        main.rename('new_name')   # rename heads
+        main.rename('main')
         # ![1-test_references_and_objects]
 
         # [2-test_references_and_objects]
@@ -201,12 +201,12 @@ class Tutorials(TestBase):
 
         # [3-test_references_and_objects]
         head = repo.head            # the head points to the active branch/ref
-        master = head.reference     # retrieve the reference the head points to
-        master.commit               # from here you use it as any other reference
+        main = head.reference     # retrieve the reference the head points to
+        main.commit               # from here you use it as any other reference
         # ![3-test_references_and_objects]
 
         # [4-test_references_and_objects]
-        log = master.log()
+        log = main.log()
         log[0]                      # first (i.e. oldest) reflog entry
         log[-1]                     # last (i.e. most recent) reflog entry
         # ![4-test_references_and_objects]
@@ -257,16 +257,16 @@ class Tutorials(TestBase):
         # ![11-test_references_and_objects]
 
         # [12-test_references_and_objects]
-        repo.commit('master')
+        repo.commit('main')
         repo.commit('v0.8.1')
         repo.commit('HEAD~10')
         # ![12-test_references_and_objects]
 
         # [13-test_references_and_objects]
-        fifty_first_commits = list(repo.iter_commits('master', max_count=50))
+        fifty_first_commits = list(repo.iter_commits('main', max_count=50))
         assert len(fifty_first_commits) == 50
-        # this will return commits 21-30 from the commit list as traversed backwards master
-        ten_commits_past_twenty = list(repo.iter_commits('master', max_count=10, skip=20))
+        # this will return commits 21-30 from the commit list as traversed backwards main
+        ten_commits_past_twenty = list(repo.iter_commits('main', max_count=10, skip=20))
         assert len(ten_commits_past_twenty) == 10
         assert fifty_first_commits[20:30] == ten_commits_past_twenty
         # ![13-test_references_and_objects]
@@ -290,11 +290,11 @@ class Tutorials(TestBase):
         # ![15-test_references_and_objects]
 
         # [16-test_references_and_objects]
-        assert headcommit.parents[0].parents[0].parents[0] == repo.commit('master^^^')
+        assert headcommit.parents[0].parents[0].parents[0] == repo.commit('main^^^')
         # ![16-test_references_and_objects]
 
         # [17-test_references_and_objects]
-        tree = repo.heads.master.commit.tree
+        tree = repo.heads.main.commit.tree
         assert len(tree.hexsha) == 40
         # ![17-test_references_and_objects]
 
@@ -372,7 +372,7 @@ class Tutorials(TestBase):
         assert origin == empty_repo.remotes.origin == empty_repo.remotes['origin']
         origin.fetch()                  # assure we actually have data. fetch() returns useful information
         # Setup a local tracking branch of a remote branch
-        empty_repo.create_head('master', origin.refs.master).set_tracking_branch(origin.refs.master)
+        empty_repo.create_head('main', origin.refs.main).set_tracking_branch(origin.refs.main)
         origin.rename('new_origin')   # rename remotes
         # push and pull behaves similarly to `git push|pull`
         origin.pull()
@@ -425,7 +425,7 @@ class Tutorials(TestBase):
 
         # [30-test_references_and_objects]
         # checkout the branch using git-checkout. It will fail as the working tree appears dirty
-        self.failUnlessRaises(git.GitCommandError, repo.heads.master.checkout)
+        self.failUnlessRaises(git.GitCommandError, repo.heads.main.checkout)
         repo.heads.past_branch.checkout()
         # ![30-test_references_and_objects]
 

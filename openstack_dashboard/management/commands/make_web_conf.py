@@ -94,7 +94,7 @@ if len(VHOSTNAME) > 1:
     context['DOMAINNAME'] = '.'.join(VHOSTNAME[1:])
 else:
     context['DOMAINNAME'] = 'openstack.org'
-context['ADMIN'] = 'webmaster@%s' % context['DOMAINNAME']
+context['ADMIN'] = 'webmain@%s' % context['DOMAINNAME']
 
 context['ACTIVATE_THIS'] = None
 virtualenv = os.environ.get('VIRTUAL_ENV')

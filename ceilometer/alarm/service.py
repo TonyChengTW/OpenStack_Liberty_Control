@@ -194,7 +194,7 @@ class PartitionedAlarmService(AlarmService, os_service.Service):
                 0)
             self.tg.add_timer(
                 eval_interval / 2,
-                self.partition_coordinator.check_mastership,
+                self.partition_coordinator.check_mainship,
                 eval_interval,
                 *[eval_interval, self._client])
             self.tg.add_timer(

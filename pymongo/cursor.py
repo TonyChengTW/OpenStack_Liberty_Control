@@ -30,14 +30,14 @@ from pymongo.common import validate_boolean, validate_is_mapping
 from pymongo.errors import (AutoReconnect,
                             ConnectionFailure,
                             InvalidOperation,
-                            NotMasterError,
+                            NotMainError,
                             OperationFailure)
 from pymongo.message import _CursorAddress, _GetMore, _Query, _convert_exception
 from pymongo.read_preferences import ReadPreference
 
 _QUERY_OPTIONS = {
     "tailable_cursor": 2,
-    "slave_okay": 4,
+    "subordinate_okay": 4,
     "oplog_replay": 8,
     "no_timeout": 16,
     "await_data": 32,
@@ -189,7 +189,7 @@ class Cursor(object):
 
         self.__query_flags = cursor_type
         if self.__read_preference != ReadPreference.PRIMARY:
-            self.__query_flags |= _QUERY_OPTIONS["slave_okay"]
+            self.__query_flags |= _QUERY_OPTIONS["subordinate_okay"]
         if no_cursor_timeout:
             self.__query_flags |= _QUERY_OPTIONS["no_timeout"]
         if allow_partial_results:
@@ -921,8 +921,8 @@ class Cursor(object):
             if self.__query_flags & _QUERY_OPTIONS["tailable_cursor"]:
                 return
             raise
-        except NotMasterError as exc:
-            # Don't send kill cursors to another server after a "not master"
+        except NotMainError as exc:
+            # Don't send kill cursors to another server after a "not main"
             # error. It's completely pointless.
             self.__killed = True
 

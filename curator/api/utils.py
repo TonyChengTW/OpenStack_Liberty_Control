@@ -176,17 +176,17 @@ def get_version(client):
        version = version.split('.')
     return tuple(map(int, version))
 
-def is_master_node(client):
+def is_main_node(client):
     """
-    Return `True` if the connected client node is the elected master node in
+    Return `True` if the connected client node is the elected main node in
     the Elasticsearch cluster, otherwise return `False`.
 
     :arg client: The Elasticsearch client connection
     :rtype: bool
     """
     my_node_id = list(client.nodes.info('_local')['nodes'])[0]
-    master_node_id = client.cluster.state(metric='master_node')['master_node']
-    return my_node_id == master_node_id
+    main_node_id = client.cluster.state(metric='main_node')['main_node']
+    return my_node_id == main_node_id
 
 def get_repository(client, repository=''):
     """

@@ -115,7 +115,7 @@ def fake_start_stop_invalid_state(self, context, instance):
 
 
 def fake_instance_get_by_uuid_not_found(context, uuid,
-                                        columns_to_join, use_slave=False):
+                                        columns_to_join, use_subordinate=False):
     raise exception.InstanceNotFound(instance_id=uuid)
 
 
@@ -717,7 +717,7 @@ class ServersControllerTest(ControllerTest):
 
     def test_tenant_id_filter_converts_to_project_id_for_admin(self):
         def fake_get_all(context, filters=None, limit=None, marker=None,
-                         columns_to_join=None, use_slave=False,
+                         columns_to_join=None, use_subordinate=False,
                          expected_attrs=None, sort_keys=None, sort_dirs=None):
             self.assertIsNotNone(filters)
             self.assertEqual(filters['project_id'], 'newfake')
@@ -735,7 +735,7 @@ class ServersControllerTest(ControllerTest):
 
     def test_tenant_id_filter_no_admin_context(self):
         def fake_get_all(context, filters=None, limit=None, marker=None,
-                         columns_to_join=None, use_slave=False,
+                         columns_to_join=None, use_subordinate=False,
                          expected_attrs=None, sort_keys=None, sort_dirs=None):
             self.assertNotEqual(filters, None)
             self.assertEqual(filters['project_id'], 'fake')
@@ -750,7 +750,7 @@ class ServersControllerTest(ControllerTest):
 
     def test_all_tenants_param_normal(self):
         def fake_get_all(context, filters=None, limit=None, marker=None,
-                         columns_to_join=None, use_slave=False,
+                         columns_to_join=None, use_subordinate=False,
                          expected_attrs=None, sort_keys=None, sort_dirs=None):
             self.assertNotIn('project_id', filters)
             return [fakes.stub_instance(100)]
@@ -765,7 +765,7 @@ class ServersControllerTest(ControllerTest):
 
     def test_all_tenants_param_one(self):
         def fake_get_all(context, filters=None, limit=None, marker=None,
-                         columns_to_join=None, use_slave=False,
+                         columns_to_join=None, use_subordinate=False,
                          expected_attrs=None, sort_keys=None, sort_dirs=None):
             self.assertNotIn('project_id', filters)
             return [fakes.stub_instance(100)]
@@ -780,7 +780,7 @@ class ServersControllerTest(ControllerTest):
 
     def test_all_tenants_param_zero(self):
         def fake_get_all(context, filters=None, limit=None, marker=None,
-                         columns_to_join=None, use_slave=False,
+                         columns_to_join=None, use_subordinate=False,
                          expected_attrs=None, sort_keys=None, sort_dirs=None):
             self.assertNotIn('all_tenants', filters)
             return [fakes.stub_instance(100)]
@@ -795,7 +795,7 @@ class ServersControllerTest(ControllerTest):
 
     def test_all_tenants_param_false(self):
         def fake_get_all(context, filters=None, limit=None, marker=None,
-                         columns_to_join=None, use_slave=False,
+                         columns_to_join=None, use_subordinate=False,
                          expected_attrs=None, sort_keys=None, sort_dirs=None):
             self.assertNotIn('all_tenants', filters)
             return [fakes.stub_instance(100)]
@@ -825,7 +825,7 @@ class ServersControllerTest(ControllerTest):
 
     def test_admin_restricted_tenant(self):
         def fake_get_all(context, filters=None, limit=None, marker=None,
-                         columns_to_join=None, use_slave=False,
+                         columns_to_join=None, use_subordinate=False,
                          expected_attrs=None, sort_keys=None, sort_dirs=None):
             self.assertIsNotNone(filters)
             self.assertEqual(filters['project_id'], 'fake')
@@ -841,7 +841,7 @@ class ServersControllerTest(ControllerTest):
 
     def test_all_tenants_pass_policy(self):
         def fake_get_all(context, filters=None, limit=None, marker=None,
-                         columns_to_join=None, use_slave=False,
+                         columns_to_join=None, use_subordinate=False,
                          expected_attrs=None, sort_keys=None, sort_dirs=None):
             self.assertIsNotNone(filters)
             self.assertNotIn('project_id', filters)

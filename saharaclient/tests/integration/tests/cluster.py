@@ -321,9 +321,9 @@ class ClusterTest(base.ITestBase):
             if self.worker:
                 self.util.client.node_group_templates.delete(self.worker.id)
                 self.worker = None
-            if self.master:
-                self.util.client.node_group_templates.delete(self.master.id)
-                self.master = None
+            if self.main:
+                self.util.client.node_group_templates.delete(self.main.id)
+                self.main = None
             if self.image:
                 self.util.client.images.unregister_image(self.image.id)
                 self.image = None

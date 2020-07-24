@@ -71,7 +71,7 @@ class Service(base.NovaPersistentObject, base.NovaObject,
     # Version 1.1: Added compute_node nested object
     # Version 1.2: String attributes updated to support unicode
     # Version 1.3: ComputeNode version 1.5
-    # Version 1.4: Added use_slave to get_by_compute_host
+    # Version 1.4: Added use_subordinate to get_by_compute_host
     # Version 1.5: ComputeNode version 1.6
     # Version 1.6: ComputeNode version 1.7
     # Version 1.7: ComputeNode version 1.8
@@ -222,7 +222,7 @@ class Service(base.NovaPersistentObject, base.NovaObject,
         return cls._from_db_object(context, cls(), db_service)
 
     @base.remotable_classmethod
-    def get_by_compute_host(cls, context, host, use_slave=False):
+    def get_by_compute_host(cls, context, host, use_subordinate=False):
         db_service = db.service_get_by_compute_host(context, host)
         return cls._from_db_object(context, cls(), db_service)
 
@@ -294,7 +294,7 @@ class Service(base.NovaPersistentObject, base.NovaObject,
         cls._MIN_VERSION_CACHE = {}
 
     @base.remotable_classmethod
-    def get_minimum_version(cls, context, binary, use_slave=False):
+    def get_minimum_version(cls, context, binary, use_subordinate=False):
         if not binary.startswith('nova-'):
             LOG.warning(_LW('get_minimum_version called with likely-incorrect '
                             'binary `%s\''), binary)
@@ -306,7 +306,7 @@ class Service(base.NovaPersistentObject, base.NovaObject,
             if cached_version:
                 return cached_version
         version = db.service_get_minimum_version(context, binary,
-                                                 use_slave=use_slave)
+                                                 use_subordinate=use_subordinate)
         if version is None:
             return 0
         # NOTE(danms): Since our return value is not controlled by object

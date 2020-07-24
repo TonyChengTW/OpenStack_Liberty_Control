@@ -39,10 +39,10 @@ database_opts = [
                                                   group='DATABASE'),
                                 cfg.DeprecatedOpt('connection',
                                                   group='sql'), ]),
-    cfg.StrOpt('slave_connection',
+    cfg.StrOpt('subordinate_connection',
                secret=True,
                help='The SQLAlchemy connection string to use to connect to the'
-                    ' slave database.'),
+                    ' subordinate database.'),
     cfg.StrOpt('mysql_sql_mode',
                default='TRADITIONAL',
                help='The SQL mode to be used for MySQL sessions. '

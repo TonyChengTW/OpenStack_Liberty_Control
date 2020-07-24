@@ -104,7 +104,7 @@ class MockFacadeTest(oslo_test_base.BaseTestCase):
     synchronous_reader = True
 
     engine_uri = 'some_connection'
-    slave_uri = None
+    subordinate_uri = None
 
     def setUp(self):
         super(MockFacadeTest, self).setUp()
@@ -115,7 +115,7 @@ class MockFacadeTest(oslo_test_base.BaseTestCase):
             connection=mock.Mock(return_value=writer_conn))
         writer_maker = mock.Mock(return_value=writer_session)
 
-        if self.slave_uri:
+        if self.subordinate_uri:
             async_reader_conn = SingletonConnection()
             async_reader_engine = SingletonEngine(async_reader_conn)
             async_reader_session = mock.Mock(
@@ -171,7 +171,7 @@ class MockFacadeTest(oslo_test_base.BaseTestCase):
         def create_engine(sql_connection, **kw):
             if sql_connection == self.engine_uri:
                 return self.engines.writer
-            elif sql_connection == self.slave_uri:
+            elif sql_connection == self.subordinate_uri:
                 return self.engines.async_reader
             else:
                 assert False
@@ -189,7 +189,7 @@ class MockFacadeTest(oslo_test_base.BaseTestCase):
 
         self.factory.configure(
             connection=self.engine_uri,
-            slave_connection=self.slave_uri
+            subordinate_connection=self.subordinate_uri
         )
 
         facade_patcher = mock.patch.object(
@@ -222,7 +222,7 @@ class MockFacadeTest(oslo_test_base.BaseTestCase):
 
         writer_conn = SingletonConnection()
         writer_engine = SingletonEngine(writer_conn)
-        if self.slave_uri:
+        if self.subordinate_uri:
             async_reader_conn = SingletonConnection()
             async_reader_engine = SingletonEngine(async_reader_conn)
         else:
@@ -240,7 +240,7 @@ class MockFacadeTest(oslo_test_base.BaseTestCase):
         def create_engine(sql_connection, **kw):
             if sql_connection == self.engine_uri:
                 return engines.writer
-            elif sql_connection == self.slave_uri:
+            elif sql_connection == self.subordinate_uri:
                 return engines.async_reader
             else:
                 assert False
@@ -250,9 +250,9 @@ class MockFacadeTest(oslo_test_base.BaseTestCase):
             sql_connection=self.engine_uri,
             **dict((k, mock.ANY) for k in self.factory._engine_cfg.keys())
         )
-        if self.slave_uri:
+        if self.subordinate_uri:
             engine_factory(
-                sql_connection=self.slave_uri,
+                sql_connection=self.subordinate_uri,
                 **dict((k, mock.ANY) for k in self.factory._engine_cfg.keys())
             )
 
@@ -317,7 +317,7 @@ class MockFacadeTest(oslo_test_base.BaseTestCase):
         )
         writer_maker = mock.Mock(return_value=writer_session)
 
-        if self.slave_uri:
+        if self.subordinate_uri:
             async_reader_session = mock.Mock(connection=mock.Mock(
                 return_value=engines.async_reader._assert_connection)
             )
@@ -352,7 +352,7 @@ class MockFacadeTest(oslo_test_base.BaseTestCase):
         maker_factories(
             autocommit=True, engine=engines.writer,
             expire_on_commit=False)
-        if self.slave_uri:
+        if self.subordinate_uri:
             maker_factories(
                 autocommit=True, engine=engines.async_reader,
                 expire_on_commit=False)
@@ -937,12 +937,12 @@ class MockFacadeTest(oslo_test_base.BaseTestCase):
         mgr1 = enginefacade.transaction_context()
         mgr1.configure(
             connection=self.engine_uri,
-            slave_connection=self.slave_uri
+            subordinate_connection=self.subordinate_uri
         )
         mgr2 = enginefacade.transaction_context()
         mgr2.configure(
             connection=self.engine_uri,
-            slave_connection=self.slave_uri
+            subordinate_connection=self.subordinate_uri
         )
 
         context = oslo_context.RequestContext()
@@ -974,12 +974,12 @@ class MockFacadeTest(oslo_test_base.BaseTestCase):
         mgr1 = enginefacade.transaction_context()
         mgr1.configure(
             connection=self.engine_uri,
-            slave_connection=self.slave_uri
+            subordinate_connection=self.subordinate_uri
         )
         mgr2 = enginefacade.transaction_context()
         mgr2.configure(
             connection=self.engine_uri,
-            slave_connection=self.slave_uri
+            subordinate_connection=self.subordinate_uri
         )
 
         context = oslo_context.RequestContext()
@@ -1005,18 +1005,18 @@ class MockFacadeTest(oslo_test_base.BaseTestCase):
         )
 
 
-class SynchronousReaderWSlaveMockFacadeTest(MockFacadeTest):
+class SynchronousReaderWSubordinateMockFacadeTest(MockFacadeTest):
     synchronous_reader = True
 
     engine_uri = 'some_connection'
-    slave_uri = 'some_slave_connection'
+    subordinate_uri = 'some_subordinate_connection'
 
 
-class AsyncReaderWSlaveMockFacadeTest(MockFacadeTest):
+class AsyncReaderWSubordinateMockFacadeTest(MockFacadeTest):
     synchronous_reader = False
 
     engine_uri = 'some_connection'
-    slave_uri = 'some_slave_connection'
+    subordinate_uri = 'some_subordinate_connection'
 
 
 class LegacyIntegrationtest(test_base.DbTestCase):

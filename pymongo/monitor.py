@@ -19,7 +19,7 @@ import weakref
 from bson.codec_options import DEFAULT_CODEC_OPTIONS
 from pymongo import common, helpers, message, periodic_executor
 from pymongo.server_type import SERVER_TYPE
-from pymongo.ismaster import IsMaster
+from pymongo.ismain import IsMain
 from pymongo.monotonic import time as _time
 from pymongo.read_preferences import MovingAverage
 from pymongo.server_description import ServerDescription
@@ -100,11 +100,11 @@ class Monitor(object):
             self.close()
 
     def _check_with_retry(self):
-        """Call ismaster once or twice. Reset server's pool on error.
+        """Call ismain once or twice. Reset server's pool on error.
 
         Returns a ServerDescription.
         """
-        # According to the spec, if an ismaster call fails we reset the
+        # According to the spec, if an ismain call fails we reset the
         # server's pool. If a server was once connected, change its type
         # to Unknown only after retrying once.
         address = self._server_description.address
@@ -132,7 +132,7 @@ class Monitor(object):
                 return default
 
     def _check_once(self):
-        """A single attempt to call ismaster.
+        """A single attempt to call ismain.
 
         Returns a ServerDescription, or raises an exception.
         """
@@ -141,23 +141,23 @@ class Monitor(object):
             self._avg_round_trip_time.add_sample(round_trip_time)
             sd = ServerDescription(
                 address=self._server_description.address,
-                ismaster=response,
+                ismain=response,
                 round_trip_time=self._avg_round_trip_time.get())
 
             return sd
 
     def _check_with_socket(self, sock_info):
-        """Return (IsMaster, round_trip_time).
+        """Return (IsMain, round_trip_time).
 
         Can raise ConnectionFailure or OperationFailure.
         """
         start = _time()
         request_id, msg, max_doc_size = message.query(
-            0, 'admin.$cmd', 0, -1, {'ismaster': 1},
+            0, 'admin.$cmd', 0, -1, {'ismain': 1},
             None, DEFAULT_CODEC_OPTIONS)
 
         # TODO: use sock_info.command()
         sock_info.send_message(msg, max_doc_size)
         raw_response = sock_info.receive_message(1, request_id)
         result = helpers._unpack_response(raw_response)
-        return IsMaster(result['data'][0]), _time() - start
+        return IsMain(result['data'][0]), _time() - start

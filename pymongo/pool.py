@@ -25,9 +25,9 @@ from pymongo.errors import (AutoReconnect,
                             ConfigurationError,
                             DocumentTooLarge,
                             NetworkTimeout,
-                            NotMasterError,
+                            NotMainError,
                             OperationFailure)
-from pymongo.ismaster import IsMaster
+from pymongo.ismain import IsMain
 from pymongo.monotonic import time as _time
 from pymongo.network import (command,
                              receive_message,
@@ -153,26 +153,26 @@ class SocketInfo(object):
     :Parameters:
       - `sock`: a raw socket object
       - `pool`: a Pool instance
-      - `ismaster`: optional IsMaster instance, response to ismaster on `sock`
+      - `ismain`: optional IsMain instance, response to ismain on `sock`
       - `address`: the server's (host, port)
     """
-    def __init__(self, sock, pool, ismaster, address):
+    def __init__(self, sock, pool, ismain, address):
         self.sock = sock
         self.address = address
         self.authset = set()
         self.closed = False
         self.last_checkout = _time()
-        self.is_writable = ismaster.is_writable if ismaster else None
-        self.max_wire_version = ismaster.max_wire_version if ismaster else None
-        self.max_bson_size = ismaster.max_bson_size if ismaster else None
-        self.max_message_size = ismaster.max_message_size if ismaster else None
+        self.is_writable = ismain.is_writable if ismain else None
+        self.max_wire_version = ismain.max_wire_version if ismain else None
+        self.max_bson_size = ismain.max_bson_size if ismain else None
+        self.max_message_size = ismain.max_message_size if ismain else None
         self.max_write_batch_size = (
-            ismaster.max_write_batch_size if ismaster else None)
+            ismain.max_write_batch_size if ismain else None)
 
         self.listeners = pool.opts.event_listeners
 
-        if ismaster:
-            self.is_mongos = ismaster.server_type == SERVER_TYPE.Mongos
+        if ismain:
+            self.is_mongos = ismain.server_type == SERVER_TYPE.Mongos
         else:
             self.is_mongos = None
 
@@ -180,7 +180,7 @@ class SocketInfo(object):
         # created before the last reset.
         self.pool_id = pool.pool_id
 
-    def command(self, dbname, spec, slave_ok=False,
+    def command(self, dbname, spec, subordinate_ok=False,
                 read_preference=ReadPreference.PRIMARY,
                 codec_options=DEFAULT_CODEC_OPTIONS, check=True,
                 allowable_errors=None, check_keys=False,
@@ -190,7 +190,7 @@ class SocketInfo(object):
         :Parameters:
           - `dbname`: name of the database on which to run the command
           - `spec`: a command document as a dict, SON, or mapping object
-          - `slave_ok`: whether to set the SlaveOkay wire protocol bit
+          - `subordinate_ok`: whether to set the SubordinateOkay wire protocol bit
           - `read_preference`: a read preference
           - `codec_options`: a CodecOptions instance
           - `check`: raise OperationFailure if there are errors
@@ -204,7 +204,7 @@ class SocketInfo(object):
                 'with a max wire version of %d.'
                 % (read_concern.level, self.max_wire_version))
         try:
-            return command(self.sock, dbname, spec, slave_ok,
+            return command(self.sock, dbname, spec, subordinate_ok,
                            self.is_mongos, read_preference, codec_options,
                            check, allowable_errors, self.address,
                            check_keys, self.listeners, self.max_bson_size,
@@ -256,7 +256,7 @@ class SocketInfo(object):
         """
         if not with_last_error and not self.is_writable:
             # Write won't succeed, bail as if we'd done a getlasterror.
-            raise NotMasterError("not master")
+            raise NotMainError("not main")
 
         self.send_message(msg, max_doc_size)
         if with_last_error:
@@ -277,7 +277,7 @@ class SocketInfo(object):
         assert response['number_returned'] == 1
         result = response['data'][0]
 
-        # Raises NotMasterError or OperationFailure.
+        # Raises NotMainError or OperationFailure.
         helpers._check_command_response(result)
         return result
 
@@ -448,7 +448,7 @@ class Pool:
         :Parameters:
           - `address`: a (hostname, port) tuple
           - `options`: a PoolOptions instance
-          - `handshake`: whether to call ismaster for each new SocketInfo
+          - `handshake`: whether to call ismain for each new SocketInfo
         """
         # Check a socket's health with socket_closed() every once in a while.
         # Can override for testing: 0 to always check, None to never check.
@@ -496,13 +496,13 @@ class Pool:
         try:
             sock = _configured_socket(self.address, self.opts)
             if self.handshake:
-                ismaster = IsMaster(command(sock, 'admin', {'ismaster': 1},
+                ismain = IsMain(command(sock, 'admin', {'ismain': 1},
                                             False, False,
                                             ReadPreference.PRIMARY,
                                             DEFAULT_CODEC_OPTIONS))
             else:
-                ismaster = None
-            return SocketInfo(sock, self, ismaster, self.address)
+                ismain = None
+            return SocketInfo(sock, self, ismain, self.address)
         except socket.error as error:
             if sock is not None:
                 sock.close()

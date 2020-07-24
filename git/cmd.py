@@ -761,7 +761,7 @@ class Git(LazyMixin):
             as execute().
 
         ``Examples``::
-            git.rev_list('master', max_count=10, header=True)
+            git.rev_list('main', max_count=10, header=True)
 
         :return: Same as ``execute``"""
         # Handle optional arguments prior to calling transform_kwargs

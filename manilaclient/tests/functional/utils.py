@@ -48,16 +48,16 @@ def multi_line_row_table(output_lines, group_by_column_index=0):
                 and is_table_border(parsed_rows[0])
                 and is_table_border(parsed_rows[-1]))
 
-    def merge_cells(master_cell, value_cell):
+    def merge_cells(main_cell, value_cell):
         if value_cell:
-            if not isinstance(master_cell, list):
-                master_cell = [master_cell]
-            master_cell.append(value_cell)
+            if not isinstance(main_cell, list):
+                main_cell = [main_cell]
+            main_cell.append(value_cell)
 
-        if is_embedded_table(master_cell):
-            return multi_line_row_table('\n'.join(master_cell), None)
+        if is_embedded_table(main_cell):
+            return multi_line_row_table('\n'.join(main_cell), None)
 
-        return master_cell
+        return main_cell
 
     def is_empty_row(row):
         empty_cells = 0

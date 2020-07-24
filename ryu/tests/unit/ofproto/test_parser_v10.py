@@ -1675,7 +1675,7 @@ class TestNXActionBundle(unittest.TestCase):
 
     # NX_ACTION_BUNDLE_PACK_STR
     # '!HHIHHHHIHHI4x'...type, len, vendor, subtype, algorithm,
-    #                    fields, basis, slave_type, n_slaves,
+    #                    fields, basis, subordinate_type, n_subordinates,
     #                    ofs_nbits, dst, zfill
     type_ = {'buf': b'\xff\xff', 'val': ofproto.OFPAT_VENDOR}
     len_ = {'buf': b'\x00\x20', 'val': ofproto.NX_ACTION_BUNDLE_SIZE}
@@ -1685,16 +1685,16 @@ class TestNXActionBundle(unittest.TestCase):
     algorithm = {'buf': b'\x51\xa7', 'val': 20903}
     fields = {'buf': b'\xf8\xef', 'val': 63727}
     basis = {'buf': b'\xfd\x6f', 'val': 64879}
-    slave_type = {'buf': b'\x7c\x51\x0f\xe0', 'val': 2085687264}
-    n_slaves = {'buf': b'\x00\x02', 'val': 2}
+    subordinate_type = {'buf': b'\x7c\x51\x0f\xe0', 'val': 2085687264}
+    n_subordinates = {'buf': b'\x00\x02', 'val': 2}
     ofs_nbits = {'buf': b'\xec\xf7', 'val': 60663}
     dst = {'buf': b'\x50\x7c\x75\xfe', 'val': 1350333950}
     zfill = b'\x00' * 4
 
-    slaves_buf = (b'\x00\x01', b'\x00\x02')
-    slaves_val = (1, 2)
+    subordinates_buf = (b'\x00\x01', b'\x00\x02')
+    subordinates_val = (1, 2)
 
-    _len = len_['val'] + len(slaves_val) * 2
+    _len = len_['val'] + len(subordinates_val) * 2
     _len += (_len % 8)
 
     buf = type_['buf'] \
@@ -1704,22 +1704,22 @@ class TestNXActionBundle(unittest.TestCase):
         + algorithm['buf'] \
         + fields['buf'] \
         + basis['buf'] \
-        + slave_type['buf'] \
-        + n_slaves['buf'] \
+        + subordinate_type['buf'] \
+        + n_subordinates['buf'] \
         + ofs_nbits['buf'] \
         + dst['buf'] \
         + zfill \
-        + slaves_buf[0] \
-        + slaves_buf[1]
+        + subordinates_buf[0] \
+        + subordinates_buf[1]
 
     c = NXActionBundle(algorithm['val'],
                        fields['val'],
                        basis['val'],
-                       slave_type['val'],
-                       n_slaves['val'],
+                       subordinate_type['val'],
+                       n_subordinates['val'],
                        ofs_nbits['val'],
                        dst['val'],
-                       slaves_val)
+                       subordinates_val)
 
     def setUp(self):
         pass
@@ -1735,15 +1735,15 @@ class TestNXActionBundle(unittest.TestCase):
         eq_(self.algorithm['val'], self.c.algorithm)
         eq_(self.fields['val'], self.c.fields)
         eq_(self.basis['val'], self.c.basis)
-        eq_(self.slave_type['val'], self.c.slave_type)
-        eq_(self.n_slaves['val'], self.c.n_slaves)
+        eq_(self.subordinate_type['val'], self.c.subordinate_type)
+        eq_(self.n_subordinates['val'], self.c.n_subordinates)
         eq_(self.ofs_nbits['val'], self.c.ofs_nbits)
         eq_(self.dst['val'], self.c.dst)
 
-        # slaves
-        slaves = self.c.slaves
-        eq_(self.slaves_val[0], slaves[0])
-        eq_(self.slaves_val[1], slaves[1])
+        # subordinates
+        subordinates = self.c.subordinates
+        eq_(self.subordinates_val[0], subordinates[0])
+        eq_(self.subordinates_val[1], subordinates[1])
 
     def test_parser(self):
         res = self.c.parser(self.buf, 0)
@@ -1755,15 +1755,15 @@ class TestNXActionBundle(unittest.TestCase):
         eq_(self.algorithm['val'], res.algorithm)
         eq_(self.fields['val'], res.fields)
         eq_(self.basis['val'], res.basis)
-        eq_(self.slave_type['val'], res.slave_type)
-        eq_(self.n_slaves['val'], res.n_slaves)
+        eq_(self.subordinate_type['val'], res.subordinate_type)
+        eq_(self.n_subordinates['val'], res.n_subordinates)
         eq_(self.ofs_nbits['val'], res.ofs_nbits)
         eq_(self.dst['val'], res.dst)
 
-        # slaves
-        slaves = res.slaves
-        eq_(self.slaves_val[0], slaves[0])
-        eq_(self.slaves_val[1], slaves[1])
+        # subordinates
+        subordinates = res.subordinates
+        eq_(self.subordinates_val[0], subordinates[0])
+        eq_(self.subordinates_val[1], subordinates[1])
 
     def test_serialize(self):
         buf = bytearray()
@@ -1782,8 +1782,8 @@ class TestNXActionBundle(unittest.TestCase):
         eq_(self.algorithm['val'], res[4])
         eq_(self.fields['val'], res[5])
         eq_(self.basis['val'], res[6])
-        eq_(self.slave_type['val'], res[7])
-        eq_(self.n_slaves['val'], res[8])
+        eq_(self.subordinate_type['val'], res[7])
+        eq_(self.n_subordinates['val'], res[8])
         eq_(self.ofs_nbits['val'], res[9])
         eq_(self.dst['val'], res[10])
 
@@ -1794,7 +1794,7 @@ class TestNXActionBundleLoad(unittest.TestCase):
 
     # NX_ACTION_BUNDLE_PACK_STR
     # '!HHIHHHHIHHI4x'...type, len, vendor, subtype, algorithm,
-    #                    fields, basis, slave_type, n_slaves,
+    #                    fields, basis, subordinate_type, n_subordinates,
     #                    ofs_nbits, dst, zfill
     type_ = {'buf': b'\xff\xff', 'val': ofproto.OFPAT_VENDOR}
     len_ = {'buf': b'\x00\x20', 'val': ofproto.NX_ACTION_BUNDLE_SIZE}
@@ -1804,16 +1804,16 @@ class TestNXActionBundleLoad(unittest.TestCase):
     algorithm = {'buf': b'\x83\x15', 'val': 33557}
     fields = {'buf': b'\xc2\x7a', 'val': 49786}
     basis = {'buf': b'\x86\x18', 'val': 34328}
-    slave_type = {'buf': b'\x18\x42\x0b\x55', 'val': 406981461}
-    n_slaves = {'buf': b'\x00\x02', 'val': 2}
+    subordinate_type = {'buf': b'\x18\x42\x0b\x55', 'val': 406981461}
+    n_subordinates = {'buf': b'\x00\x02', 'val': 2}
     ofs_nbits = {'buf': b'\xd2\x9d', 'val': 53917}
     dst = {'buf': b'\x37\xfe\xb3\x60', 'val': 939438944}
     zfill = b'\x00' * 4
 
-    slaves_buf = (b'\x00\x01', b'\x00\x02')
-    slaves_val = (1, 2)
+    subordinates_buf = (b'\x00\x01', b'\x00\x02')
+    subordinates_val = (1, 2)
 
-    _len = len_['val'] + len(slaves_val) * 2
+    _len = len_['val'] + len(subordinates_val) * 2
     _len += (_len % 8)
 
     buf = type_['buf'] \
@@ -1823,22 +1823,22 @@ class TestNXActionBundleLoad(unittest.TestCase):
         + algorithm['buf'] \
         + fields['buf'] \
         + basis['buf'] \
-        + slave_type['buf'] \
-        + n_slaves['buf'] \
+        + subordinate_type['buf'] \
+        + n_subordinates['buf'] \
         + ofs_nbits['buf'] \
         + dst['buf'] \
         + zfill \
-        + slaves_buf[0] \
-        + slaves_buf[1]
+        + subordinates_buf[0] \
+        + subordinates_buf[1]
 
     c = NXActionBundleLoad(algorithm['val'],
                            fields['val'],
                            basis['val'],
-                           slave_type['val'],
-                           n_slaves['val'],
+                           subordinate_type['val'],
+                           n_subordinates['val'],
                            ofs_nbits['val'],
                            dst['val'],
-                           slaves_val)
+                           subordinates_val)
 
     def setUp(self):
         pass
@@ -1854,15 +1854,15 @@ class TestNXActionBundleLoad(unittest.TestCase):
         eq_(self.algorithm['val'], self.c.algorithm)
         eq_(self.fields['val'], self.c.fields)
         eq_(self.basis['val'], self.c.basis)
-        eq_(self.slave_type['val'], self.c.slave_type)
-        eq_(self.n_slaves['val'], self.c.n_slaves)
+        eq_(self.subordinate_type['val'], self.c.subordinate_type)
+        eq_(self.n_subordinates['val'], self.c.n_subordinates)
         eq_(self.ofs_nbits['val'], self.c.ofs_nbits)
         eq_(self.dst['val'], self.c.dst)
 
-        # slaves
-        slaves = self.c.slaves
-        eq_(self.slaves_val[0], slaves[0])
-        eq_(self.slaves_val[1], slaves[1])
+        # subordinates
+        subordinates = self.c.subordinates
+        eq_(self.subordinates_val[0], subordinates[0])
+        eq_(self.subordinates_val[1], subordinates[1])
 
     def test_parser(self):
         res = self.c.parser(self.buf, 0)
@@ -1874,15 +1874,15 @@ class TestNXActionBundleLoad(unittest.TestCase):
         eq_(self.algorithm['val'], res.algorithm)
         eq_(self.fields['val'], res.fields)
         eq_(self.basis['val'], res.basis)
-        eq_(self.slave_type['val'], res.slave_type)
-        eq_(self.n_slaves['val'], res.n_slaves)
+        eq_(self.subordinate_type['val'], res.subordinate_type)
+        eq_(self.n_subordinates['val'], res.n_subordinates)
         eq_(self.ofs_nbits['val'], res.ofs_nbits)
         eq_(self.dst['val'], res.dst)
 
-        # slaves
-        slaves = res.slaves
-        eq_(self.slaves_val[0], slaves[0])
-        eq_(self.slaves_val[1], slaves[1])
+        # subordinates
+        subordinates = res.subordinates
+        eq_(self.subordinates_val[0], subordinates[0])
+        eq_(self.subordinates_val[1], subordinates[1])
 
     def test_serialize(self):
         buf = bytearray()
@@ -1901,8 +1901,8 @@ class TestNXActionBundleLoad(unittest.TestCase):
         eq_(self.algorithm['val'], res[4])
         eq_(self.fields['val'], res[5])
         eq_(self.basis['val'], res[6])
-        eq_(self.slave_type['val'], res[7])
-        eq_(self.n_slaves['val'], res[8])
+        eq_(self.subordinate_type['val'], res[7])
+        eq_(self.n_subordinates['val'], res[8])
         eq_(self.ofs_nbits['val'], res[9])
         eq_(self.dst['val'], res[10])
 

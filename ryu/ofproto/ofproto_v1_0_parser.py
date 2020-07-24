@@ -1053,65 +1053,65 @@ class NXActionNote(NXActionHeader):
 
 
 class NXActionBundleBase(NXActionHeader):
-    def __init__(self, algorithm, fields, basis, slave_type, n_slaves,
-                 ofs_nbits, dst, slaves):
+    def __init__(self, algorithm, fields, basis, subordinate_type, n_subordinates,
+                 ofs_nbits, dst, subordinates):
         super(NXActionBundleBase, self).__init__()
-        _len = ofproto.NX_ACTION_BUNDLE_SIZE + len(slaves) * 2
+        _len = ofproto.NX_ACTION_BUNDLE_SIZE + len(subordinates) * 2
         _len += (_len % 8)
         self.len = _len
 
         self.algorithm = algorithm
         self.fields = fields
         self.basis = basis
-        self.slave_type = slave_type
-        self.n_slaves = n_slaves
+        self.subordinate_type = subordinate_type
+        self.n_subordinates = n_subordinates
         self.ofs_nbits = ofs_nbits
         self.dst = dst
-        self.slaves = slaves
+        self.subordinates = subordinates
 
     def serialize(self, buf, offset):
-        slave_offset = offset + ofproto.NX_ACTION_BUNDLE_SIZE
+        subordinate_offset = offset + ofproto.NX_ACTION_BUNDLE_SIZE
 
-        for s in self.slaves:
-            msg_pack_into('!H', buf, slave_offset, s)
-            slave_offset += 2
+        for s in self.subordinates:
+            msg_pack_into('!H', buf, subordinate_offset, s)
+            subordinate_offset += 2
 
-        pad_len = (len(self.slaves) * 2 +
+        pad_len = (len(self.subordinates) * 2 +
                    ofproto.NX_ACTION_BUNDLE_SIZE) % 8
 
         if pad_len != 0:
-            msg_pack_into('%dx' % pad_len, buf, slave_offset)
+            msg_pack_into('%dx' % pad_len, buf, subordinate_offset)
 
         msg_pack_into(ofproto.NX_ACTION_BUNDLE_PACK_STR, buf,
                       offset, self.type, self.len, self.vendor, self.subtype,
                       self.algorithm, self.fields, self.basis,
-                      self.slave_type, self.n_slaves,
+                      self.subordinate_type, self.n_subordinates,
                       self.ofs_nbits, self.dst)
 
     @classmethod
     def parser(cls, action_cls, buf, offset):
         (type_, len_, vendor, subtype, algorithm, fields, basis,
-            slave_type, n_slaves, ofs_nbits, dst) = struct.unpack_from(
+            subordinate_type, n_subordinates, ofs_nbits, dst) = struct.unpack_from(
             ofproto.NX_ACTION_BUNDLE_PACK_STR, buf, offset)
-        slave_offset = offset + ofproto.NX_ACTION_BUNDLE_SIZE
+        subordinate_offset = offset + ofproto.NX_ACTION_BUNDLE_SIZE
 
-        slaves = []
-        for i in range(0, n_slaves):
-            s = struct.unpack_from('!H', buf, slave_offset)
-            slaves.append(s[0])
-            slave_offset += 2
+        subordinates = []
+        for i in range(0, n_subordinates):
+            s = struct.unpack_from('!H', buf, subordinate_offset)
+            subordinates.append(s[0])
+            subordinate_offset += 2
 
-        return action_cls(algorithm, fields, basis, slave_type,
-                          n_slaves, ofs_nbits, dst, slaves)
+        return action_cls(algorithm, fields, basis, subordinate_type,
+                          n_subordinates, ofs_nbits, dst, subordinates)
 
 
 @NXActionHeader.register_nx_action_subtype(ofproto.NXAST_BUNDLE, 0)
 class NXActionBundle(NXActionBundleBase):
-    def __init__(self, algorithm, fields, basis, slave_type, n_slaves,
-                 ofs_nbits, dst, slaves):
+    def __init__(self, algorithm, fields, basis, subordinate_type, n_subordinates,
+                 ofs_nbits, dst, subordinates):
         super(NXActionBundle, self).__init__(
-            algorithm, fields, basis, slave_type, n_slaves,
-            ofs_nbits, dst, slaves)
+            algorithm, fields, basis, subordinate_type, n_subordinates,
+            ofs_nbits, dst, subordinates)
 
     @classmethod
     def parser(cls, buf, offset):
@@ -1120,11 +1120,11 @@ class NXActionBundle(NXActionBundleBase):
 
 @NXActionHeader.register_nx_action_subtype(ofproto.NXAST_BUNDLE_LOAD, 0)
 class NXActionBundleLoad(NXActionBundleBase):
-    def __init__(self, algorithm, fields, basis, slave_type, n_slaves,
-                 ofs_nbits, dst, slaves):
+    def __init__(self, algorithm, fields, basis, subordinate_type, n_subordinates,
+                 ofs_nbits, dst, subordinates):
         super(NXActionBundleLoad, self).__init__(
-            algorithm, fields, basis, slave_type, n_slaves,
-            ofs_nbits, dst, slaves)
+            algorithm, fields, basis, subordinate_type, n_subordinates,
+            ofs_nbits, dst, subordinates)
 
     @classmethod
     def parser(cls, buf, offset):

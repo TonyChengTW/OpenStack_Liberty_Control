@@ -100,7 +100,7 @@ class Head(Reference):
         >>> head = repo.heads[0]
 
         >>> head.name
-        'master'
+        'main'
 
         >>> head.commit
         <git.Commit "1c09f116cbc2cb4100fb6935bb162daa4723f455">

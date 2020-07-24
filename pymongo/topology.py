@@ -164,7 +164,7 @@ class Topology(object):
                                   address)
 
     def on_change(self, server_description):
-        """Process a new ServerDescription after an ismaster call completes."""
+        """Process a new ServerDescription after an ismain call completes."""
         # We do no I/O holding the lock.
         with self._lock:
             # Any monitored server was definitely in the topology description

@@ -48,7 +48,7 @@ class ShellTest(shell_test_base.TestCommandLineArgument):
         self.assertTrue(mock_create.called)
 
         self._test_arg_success('bay-create --baymodel xxx --node-count 123 '
-                               '--master-count 123')
+                               '--main-count 123')
         self.assertTrue(mock_create.called)
 
         self._test_arg_success('bay-create --baymodel xxx '

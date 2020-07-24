@@ -66,10 +66,10 @@ class TestProxy(test.MockTestCase):
 
         # other mocking
         self.on_wait_mock = mock.MagicMock(name='on_wait')
-        self.master_mock.attach_mock(self.on_wait_mock, 'on_wait')
+        self.main_mock.attach_mock(self.on_wait_mock, 'on_wait')
 
-        # reset master mock
-        self.resetMasterMock()
+        # reset main mock
+        self.resetMainMock()
 
     def _queue_name(self, topic):
         return "%s_%s" % (self.exchange, topic)
@@ -117,41 +117,41 @@ class TestProxy(test.MockTestCase):
                                                      mock.ANY)
         ]
 
-    def proxy(self, reset_master_mock=False, **kwargs):
+    def proxy(self, reset_main_mock=False, **kwargs):
         proxy_kwargs = dict(topic=self.topic,
                             exchange=self.exchange,
                             url=self.broker_url,
                             type_handlers={})
         proxy_kwargs.update(kwargs)
         p = proxy.Proxy(**proxy_kwargs)
-        if reset_master_mock:
-            self.resetMasterMock()
+        if reset_main_mock:
+            self.resetMainMock()
         return p
 
     def test_creation(self):
         self.proxy()
 
-        master_mock_calls = [
+        main_mock_calls = [
             mock.call.Connection(self.broker_url, transport=None,
                                  transport_options=None),
             mock.call.Exchange(name=self.exchange,
                                durable=False,
                                auto_delete=True)
         ]
-        self.assertEqual(master_mock_calls, self.master_mock.mock_calls)
+        self.assertEqual(main_mock_calls, self.main_mock.mock_calls)
 
     def test_creation_custom(self):
         transport_opts = {'context': 'context'}
         self.proxy(transport='memory', transport_options=transport_opts)
 
-        master_mock_calls = [
+        main_mock_calls = [
             mock.call.Connection(self.broker_url, transport='memory',
                                  transport_options=transport_opts),
             mock.call.Exchange(name=self.exchange,
                                durable=False,
                                auto_delete=True)
         ]
-        self.assertEqual(master_mock_calls, self.master_mock.mock_calls)
+        self.assertEqual(main_mock_calls, self.main_mock.mock_calls)
 
     def test_publish(self):
         msg_mock = mock.MagicMock()
@@ -160,11 +160,11 @@ class TestProxy(test.MockTestCase):
         routing_key = 'routing-key'
         task_uuid = 'task-uuid'
 
-        p = self.proxy(reset_master_mock=True)
+        p = self.proxy(reset_main_mock=True)
         p.publish(msg_mock, routing_key, correlation_id=task_uuid)
 
         mock_producer = mock.call.connection.Producer()
-        master_mock_calls = self.proxy_publish_calls([
+        main_mock_calls = self.proxy_publish_calls([
             mock_producer.__enter__().publish(body=msg_data,
                                               routing_key=routing_key,
                                               exchange=self.exchange_inst_mock,
@@ -173,59 +173,59 @@ class TestProxy(test.MockTestCase):
                                               type=msg_mock.TYPE,
                                               reply_to=None)
         ], routing_key)
-        self.master_mock.assert_has_calls(master_mock_calls)
+        self.main_mock.assert_has_calls(main_mock_calls)
 
     def test_start(self):
         try:
             # KeyboardInterrupt will be raised after two iterations
-            self.proxy(reset_master_mock=True).start()
+            self.proxy(reset_main_mock=True).start()
         except KeyboardInterrupt:
             pass
 
-        master_calls = self.proxy_start_calls([
+        main_calls = self.proxy_start_calls([
             mock.call.connection.drain_events(timeout=self.de_period),
             mock.call.connection.drain_events(timeout=self.de_period),
             mock.call.connection.drain_events(timeout=self.de_period),
         ], exc_type=KeyboardInterrupt)
-        self.master_mock.assert_has_calls(master_calls)
+        self.main_mock.assert_has_calls(main_calls)
 
     def test_start_with_on_wait(self):
         try:
             # KeyboardInterrupt will be raised after two iterations
-            self.proxy(reset_master_mock=True,
+            self.proxy(reset_main_mock=True,
                        on_wait=self.on_wait_mock).start()
         except KeyboardInterrupt:
             pass
 
-        master_calls = self.proxy_start_calls([
+        main_calls = self.proxy_start_calls([
             mock.call.connection.drain_events(timeout=self.de_period),
             mock.call.on_wait(),
             mock.call.connection.drain_events(timeout=self.de_period),
             mock.call.on_wait(),
             mock.call.connection.drain_events(timeout=self.de_period),
         ], exc_type=KeyboardInterrupt)
-        self.master_mock.assert_has_calls(master_calls)
+        self.main_mock.assert_has_calls(main_calls)
 
     def test_start_with_on_wait_raises(self):
         self.on_wait_mock.side_effect = RuntimeError('Woot!')
         try:
             # KeyboardInterrupt will be raised after two iterations
-            self.proxy(reset_master_mock=True,
+            self.proxy(reset_main_mock=True,
                        on_wait=self.on_wait_mock).start()
         except KeyboardInterrupt:
             pass
 
-        master_calls = self.proxy_start_calls([
+        main_calls = self.proxy_start_calls([
             mock.call.connection.drain_events(timeout=self.de_period),
             mock.call.on_wait(),
         ], exc_type=RuntimeError)
-        self.master_mock.assert_has_calls(master_calls)
+        self.main_mock.assert_has_calls(main_calls)
 
     def test_stop(self):
         self.conn_inst_mock.drain_events.side_effect = socket.timeout
 
         # create proxy
-        pr = self.proxy(reset_master_mock=True)
+        pr = self.proxy(reset_main_mock=True)
 
         # check that proxy is not running yes
         self.assertFalse(pr.is_running)

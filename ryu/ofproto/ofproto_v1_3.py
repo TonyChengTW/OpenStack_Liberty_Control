@@ -737,7 +737,7 @@ assert (calcsize(OFP_ROLE_REQUEST_PACK_STR) + OFP_HEADER_SIZE ==
 # enum ofp_controller_role
 OFPCR_ROLE_NOCHANGE = 0     # Don't change current role.
 OFPCR_ROLE_EQUAL = 1        # Default role, full access.
-OFPCR_ROLE_MASTER = 2       # Full access, at most one master.
+OFPCR_ROLE_MASTER = 2       # Full access, at most one main.
 OFPCR_ROLE_SLAVE = 3        # Read-only access.
 
 # struct ofp_async_config
@@ -910,7 +910,7 @@ OFPBRC_BUFFER_EMPTY = 7                 # Specified buffer has already been
 OFPBRC_BUFFER_UNKNOWN = 8               # Specified buffer does not exist.
 OFPBRC_BAD_TABLE_ID = 9                 # Specified table-id invalid or does
                                         # not exist.
-OFPBRC_IS_SLAVE = 10                    # Denied because controller is slave.
+OFPBRC_IS_SLAVE = 10                    # Denied because controller is subordinate.
 OFPBRC_BAD_PORT = 11                    # Invalid port.
 OFPBRC_BAD_PACKET = 12                  # Invalid packet in packet-out
 OFPBRC_MULTIPART_BUFFER_OVERFLOW = 13   # ofp_multipart_request

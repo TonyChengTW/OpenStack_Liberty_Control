@@ -205,7 +205,7 @@ class SQLiteMixIn(MixInBase):
         self.conn.commit()
 
     def _get_all_tables(self):
-        c = self.conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        c = self.conn.execute("SELECT name FROM sqlite_main WHERE type='table'")
         return [table[0] for table in c.fetchall()]
 
     def _close_conn(self):
@@ -1928,7 +1928,7 @@ class TestSQLiteFallback(SQLiteMixIn, PandasSQLTest):
 
     def _get_index_columns(self, tbl_name):
         ixs = sql.read_sql_query(
-            "SELECT * FROM sqlite_master WHERE type = 'index' " +
+            "SELECT * FROM sqlite_main WHERE type = 'index' " +
             "AND tbl_name = '%s'" % tbl_name, self.conn)
         ix_cols = []
         for ix_name in ixs.name:

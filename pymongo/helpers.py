@@ -26,7 +26,7 @@ from pymongo import ASCENDING
 from pymongo.errors import (CursorNotFound,
                             DuplicateKeyError,
                             ExecutionTimeout,
-                            NotMasterError,
+                            NotMainError,
                             OperationFailure,
                             WriteError,
                             WriteConcernError,
@@ -92,7 +92,7 @@ def _unpack_response(response, cursor_id=None, codec_options=CodecOptions()):
     Check the response for errors and unpack, returning a dictionary
     containing the response data.
 
-    Can raise CursorNotFound, NotMasterError, ExecutionTimeout, or
+    Can raise CursorNotFound, NotMainError, ExecutionTimeout, or
     OperationFailure.
 
     :Parameters:
@@ -116,8 +116,8 @@ def _unpack_response(response, cursor_id=None, codec_options=CodecOptions()):
         error_object = bson.BSON(response[20:]).decode()
         # Fake the ok field if it doesn't exist.
         error_object.setdefault("ok", 0)
-        if error_object["$err"].startswith("not master"):
-            raise NotMasterError(error_object["$err"], error_object)
+        if error_object["$err"].startswith("not main"):
+            raise NotMainError(error_object["$err"], error_object)
         elif error_object.get("code") == 50:
             raise ExecutionTimeout(error_object.get("$err"),
                                    error_object.get("code"),
@@ -169,10 +169,10 @@ def _check_command_response(response, msg=None, allowable_errors=None):
         errmsg = details["errmsg"]
         if allowable_errors is None or errmsg not in allowable_errors:
 
-            # Server is "not master" or "recovering"
-            if (errmsg.startswith("not master")
+            # Server is "not main" or "recovering"
+            if (errmsg.startswith("not main")
                     or errmsg.startswith("node is recovering")):
-                raise NotMasterError(errmsg, response)
+                raise NotMainError(errmsg, response)
 
             # Server assertion failures
             if errmsg == "db assertion failure":
@@ -218,8 +218,8 @@ def _check_gle_response(response):
     if error_msg is None:
         return result
 
-    if error_msg.startswith("not master"):
-        raise NotMasterError(error_msg, result)
+    if error_msg.startswith("not main"):
+        raise NotMainError(error_msg, result)
 
     details = result
 
@@ -237,7 +237,7 @@ def _check_gle_response(response):
 
 
 def _first_batch(sock_info, db, coll, query, ntoreturn,
-                 slave_ok, codec_options, read_preference, cmd, listeners):
+                 subordinate_ok, codec_options, read_preference, cmd, listeners):
     """Simple query helper for retrieving a first (and possibly only) batch."""
     query = _Query(
         0, db, coll, 0, ntoreturn, query, None,
@@ -249,7 +249,7 @@ def _first_batch(sock_info, db, coll, query, ntoreturn,
     if publish:
         start = datetime.datetime.now()
 
-    request_id, msg, max_doc_size = query.get_message(slave_ok,
+    request_id, msg, max_doc_size = query.get_message(subordinate_ok,
                                                       sock_info.is_mongos)
 
     if publish:
@@ -265,7 +265,7 @@ def _first_batch(sock_info, db, coll, query, ntoreturn,
     except Exception as exc:
         if publish:
             duration = (datetime.datetime.now() - start) + encoding_duration
-            if isinstance(exc, (NotMasterError, OperationFailure)):
+            if isinstance(exc, (NotMainError, OperationFailure)):
                 failure = exc.details
             else:
                 failure = _convert_exception(exc)

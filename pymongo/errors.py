@@ -57,8 +57,8 @@ class NetworkTimeout(AutoReconnect):
     """
 
 
-class NotMasterError(AutoReconnect):
-    """The server responded "not master" or "node is recovering".
+class NotMainError(AutoReconnect):
+    """The server responded "not main" or "node is recovering".
 
     These errors result from a query, write, or command. The operation failed
     because the client thought it was using the primary but the primary has

@@ -38,7 +38,7 @@ class Reference(SymbolicReference, LazyMixin, Iterable):
 
         :param path:
             Path relative to the .git/ directory pointing to the ref in question, i.e.
-            refs/heads/master
+            refs/heads/main
         :param check_path: if False, you can provide any path. Otherwise the path must start with the
             default path prefix of this type."""
         if check_path and not path.startswith(self._common_path_default + '/'):
@@ -109,7 +109,7 @@ class Reference(SymbolicReference, LazyMixin, Iterable):
         """
         :return:
             Name of the remote we are a reference of, such as 'origin' for a reference
-            named 'origin/master'"""
+            named 'origin/main'"""
         tokens = self.path.split('/')
         # /refs/remotes/<remote name>/<branch_name>
         return tokens[2]
@@ -117,7 +117,7 @@ class Reference(SymbolicReference, LazyMixin, Iterable):
     @property
     @require_remote_ref_path
     def remote_head(self):
-        """:return: Name of the remote head itself, i.e. master.
+        """:return: Name of the remote head itself, i.e. main.
         :note: The returned name is usually not qualified enough to uniquely identify
             a branch"""
         tokens = self.path.split('/')

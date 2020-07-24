@@ -43,7 +43,7 @@ MAX_WRITE_BATCH_SIZE = 1000
 MIN_SUPPORTED_WIRE_VERSION = 0
 MAX_SUPPORTED_WIRE_VERSION = 3
 
-# Frequency to call ismaster on servers, in seconds.
+# Frequency to call ismain on servers, in seconds.
 HEARTBEAT_FREQUENCY = 10
 
 # Frequency to process kill-cursors, in seconds. See MongoClient.close_cursor.
@@ -55,7 +55,7 @@ KILL_CURSOR_FREQUENCY = 1
 # longest it is willing to wait for a new primary to be found.
 SERVER_SELECTION_TIMEOUT = 30
 
-# Spec requires at least 500ms between ismaster calls.
+# Spec requires at least 500ms between ismain calls.
 MIN_HEARTBEAT_INTERVAL = 0.5
 
 # Default connectTimeout in seconds.
@@ -92,13 +92,13 @@ def partition_node(node):
 
 
 def clean_node(node):
-    """Split and normalize a node name from an ismaster response."""
+    """Split and normalize a node name from an ismain response."""
     host, port = partition_node(node)
 
     # Normalize hostname to lowercase, since DNS is case-insensitive:
     # http://tools.ietf.org/html/rfc4343
     # This prevents useless rediscovery if "foo.com" is in the seed list but
-    # "FOO.com" is in the ismaster response.
+    # "FOO.com" is in the ismain response.
     return host.lower(), port
 
 

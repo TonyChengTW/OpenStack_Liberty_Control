@@ -78,7 +78,7 @@ class Submodule(util.IndexObject, Iterable, Traversable):
     _id_attribute_ = "name"
     k_modules_file = '.gitmodules'
     k_head_option = 'branch'
-    k_head_default = 'master'
+    k_head_default = 'main'
     k_default_mode = stat.S_IFDIR | stat.S_IFLNK        # submodules are directories with link-status
 
     # this is a bogus type for base class compatability
@@ -321,8 +321,8 @@ class Submodule(util.IndexObject, Iterable, Traversable):
             It will only be written into the configuration if it not None, which is
             when the checked out branch will be the one the remote HEAD pointed to.
             The result you get in these situation is somewhat fuzzy, and it is recommended
-            to specify at least 'master' here.
-            Examples are 'master' or 'feature/new'
+            to specify at least 'main' here.
+            Examples are 'main' or 'feature/new'
         :param no_checkout: if True, and if the repository has to be cloned manually,
             no checkout will be performed
         :return: The newly created submodule instance
@@ -428,7 +428,7 @@ class Submodule(util.IndexObject, Iterable, Traversable):
         :param to_latest_revision: if True, the submodule's sha will be ignored during checkout.
             Instead, the remote will be fetched, and the local tracking branch updated.
             This only works if we have a local tracking branch, which is the case
-            if the remote repository had a master branch, or of the 'branch' option
+            if the remote repository had a main branch, or of the 'branch' option
             was specified for this submodule and the branch existed remotely
         :param progress: UpdateProgress instance or None of no progress should be shown
         :param dry_run: if True, the operation will only be simulated, but not performed.

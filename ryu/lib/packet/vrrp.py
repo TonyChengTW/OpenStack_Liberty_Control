@@ -176,7 +176,7 @@ def ip_text_to_bin(ip_text):
         return addrconv.ipv4.text_to_bin(ip_text)
 
 
-# This is used for master selection
+# This is used for main selection
 def ip_address_lt(ip1, ip2):
     return ip_text_to_bin(ip1) < ip_text_to_bin(ip2)
 

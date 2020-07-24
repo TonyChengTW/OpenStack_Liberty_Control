@@ -76,7 +76,7 @@ def _maybe_add_read_preference(spec, read_preference):
     # Only add $readPreference if it's something other than primary to avoid
     # problems with mongos versions that don't support read preferences. Also,
     # for maximum backwards compatibility, don't add $readPreference for
-    # secondaryPreferred unless tags are in use (setting the slaveOkay bit
+    # secondaryPreferred unless tags are in use (setting the subordinateOkay bit
     # has the same effect).
     if mode and (
         mode != ReadPreference.SECONDARY_PREFERRED.mode or tag_sets != [{}]):
@@ -250,10 +250,10 @@ class _Query(object):
             self.coll, self.spec, self.fields, self.ntoskip, self.limit,
             self.batch_size, self.flags, self.read_concern), self.db
 
-    def get_message(self, set_slave_ok, is_mongos, use_cmd=False):
-        """Get a query message, possibly setting the slaveOk bit."""
-        if set_slave_ok:
-            # Set the slaveOk bit.
+    def get_message(self, set_subordinate_ok, is_mongos, use_cmd=False):
+        """Get a query message, possibly setting the subordinateOk bit."""
+        if set_subordinate_ok:
+            # Set the subordinateOk bit.
             flags = self.flags | 4
         else:
             flags = self.flags

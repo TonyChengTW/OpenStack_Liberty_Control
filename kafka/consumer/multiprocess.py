@@ -32,7 +32,7 @@ def _mp_consume(client, group, topic, chunk, queue, start, exit, pause, size):
     client.reinit()
 
     # We will start consumers without auto-commit. Auto-commit will be
-    # done by the master controller process.
+    # done by the main controller process.
     consumer = SimpleConsumer(client, group, topic,
                               partitions=chunk,
                               auto_commit=False,
@@ -116,7 +116,7 @@ class MultiProcessConsumer(Consumer):
             auto_commit_every_t=auto_commit_every_t)
 
         # Variables for managing and controlling the data flow from
-        # consumer child process to master
+        # consumer child process to main
         self.queue = MPQueue(1024)  # Child consumers dump messages into this
         self.start = Event()        # Indicates the consumers to start fetch
         self.exit = Event()         # Requests the consumers to shutdown

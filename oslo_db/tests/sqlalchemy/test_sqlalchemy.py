@@ -322,7 +322,7 @@ class EngineFacadeTestCase(oslo_test.BaseTestCase):
 
         overrides = {
             'connection': 'sqlite:///:memory:',
-            'slave_connection': None,
+            'subordinate_connection': None,
             'connection_debug': 100,
             'max_pool_size': 10,
             'mysql_sql_mode': 'TRADITIONAL',
@@ -353,42 +353,42 @@ class EngineFacadeTestCase(oslo_test.BaseTestCase):
                                           autocommit=False,
                                           expire_on_commit=True)
 
-    def test_slave_connection(self):
-        paths = self.create_tempfiles([('db.master', ''), ('db.slave', '')],
+    def test_subordinate_connection(self):
+        paths = self.create_tempfiles([('db.main', ''), ('db.subordinate', '')],
                                       ext='')
-        master_path = 'sqlite:///' + paths[0]
-        slave_path = 'sqlite:///' + paths[1]
+        main_path = 'sqlite:///' + paths[0]
+        subordinate_path = 'sqlite:///' + paths[1]
 
         facade = session.EngineFacade(
-            sql_connection=master_path,
-            slave_connection=slave_path
+            sql_connection=main_path,
+            subordinate_connection=subordinate_path
         )
 
-        master = facade.get_engine()
-        self.assertEqual(master_path, str(master.url))
-        slave = facade.get_engine(use_slave=True)
-        self.assertEqual(slave_path, str(slave.url))
+        main = facade.get_engine()
+        self.assertEqual(main_path, str(main.url))
+        subordinate = facade.get_engine(use_subordinate=True)
+        self.assertEqual(subordinate_path, str(subordinate.url))
 
-        master_session = facade.get_session()
-        self.assertEqual(master_path, str(master_session.bind.url))
-        slave_session = facade.get_session(use_slave=True)
-        self.assertEqual(slave_path, str(slave_session.bind.url))
+        main_session = facade.get_session()
+        self.assertEqual(main_path, str(main_session.bind.url))
+        subordinate_session = facade.get_session(use_subordinate=True)
+        self.assertEqual(subordinate_path, str(subordinate_session.bind.url))
 
-    def test_slave_connection_string_not_provided(self):
-        master_path = 'sqlite:///' + self.create_tempfiles(
-            [('db.master', '')], ext='')[0]
+    def test_subordinate_connection_string_not_provided(self):
+        main_path = 'sqlite:///' + self.create_tempfiles(
+            [('db.main', '')], ext='')[0]
 
-        facade = session.EngineFacade(sql_connection=master_path)
+        facade = session.EngineFacade(sql_connection=main_path)
 
-        master = facade.get_engine()
-        slave = facade.get_engine(use_slave=True)
-        self.assertIs(master, slave)
-        self.assertEqual(master_path, str(master.url))
+        main = facade.get_engine()
+        subordinate = facade.get_engine(use_subordinate=True)
+        self.assertIs(main, subordinate)
+        self.assertEqual(main_path, str(main.url))
 
-        master_session = facade.get_session()
-        self.assertEqual(master_path, str(master_session.bind.url))
-        slave_session = facade.get_session(use_slave=True)
-        self.assertEqual(master_path, str(slave_session.bind.url))
+        main_session = facade.get_session()
+        self.assertEqual(main_path, str(main_session.bind.url))
+        subordinate_session = facade.get_session(use_subordinate=True)
+        self.assertEqual(main_path, str(subordinate_session.bind.url))
 
 
 class SQLiteConnectTest(oslo_test.BaseTestCase):

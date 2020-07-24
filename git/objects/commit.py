@@ -372,8 +372,8 @@ class Commit(base.Object, Iterable, Diffable, Traversable, Serializable):
             except ValueError:
                 # head is not yet set to the ref our HEAD points to
                 # Happens on first commit
-                master = git.refs.Head.create(repo, repo.head.ref, new_commit, logmsg="commit (initial): %s" % message)
-                repo.head.set_reference(master, logmsg='commit: Switching to %s' % master)
+                main = git.refs.Head.create(repo, repo.head.ref, new_commit, logmsg="commit (initial): %s" % message)
+                repo.head.set_reference(main, logmsg='commit: Switching to %s' % main)
             # END handle empty repositories
         # END advance head handling
 

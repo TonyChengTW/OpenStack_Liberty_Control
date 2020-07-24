@@ -54,7 +54,7 @@ def snapshots(ctx, newer_than, older_than, prefix, suffix, time_unit,
         logging.info("DRY RUN MODE.  No changes will be made.")
 
     client = get_client(**ctx.parent.parent.params)
-    # Get a master-list of indices
+    # Get a main-list of indices
     snapshots = get_snapshots(client, repository=repository)
     if snapshots:
         working_list = snapshots

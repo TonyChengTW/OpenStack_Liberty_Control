@@ -70,7 +70,7 @@ class Server(object):
     def send_message_with_response(
             self,
             operation,
-            set_slave_okay,
+            set_subordinate_okay,
             all_credentials,
             listeners,
             exhaust=False):
@@ -80,7 +80,7 @@ class Server(object):
 
         :Parameters:
           - `operation`: A _Query or _GetMore object.
-          - `set_slave_okay`: Pass to operation.get_message.
+          - `set_subordinate_okay`: Pass to operation.get_message.
           - `all_credentials`: dict, maps auth source to MongoCredential.
           - `exhaust` (optional): If True, the socket used stays checked out.
             It is returned along with its Pool in the Response.
@@ -105,7 +105,7 @@ class Server(object):
                        sock_info.max_wire_version))
 
             message = operation.get_message(
-                set_slave_okay, sock_info.is_mongos, use_find_cmd)
+                set_subordinate_okay, sock_info.is_mongos, use_find_cmd)
             request_id, data, max_doc_size = self._split_message(message)
 
             if publish:

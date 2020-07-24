@@ -207,6 +207,6 @@ class TestBase(TestCase):
     def test_complex_aliases(self):
         file_obj = self._to_memcache(fixture_path('.gitconfig'))
         w_config = GitConfigParser(file_obj, read_only=False)
-        self.assertEqual(w_config.get('alias', 'rbi'), '"!g() { git rebase -i origin/${1:-master} ; } ; g"')
+        self.assertEqual(w_config.get('alias', 'rbi'), '"!g() { git rebase -i origin/${1:-main} ; } ; g"')
         w_config.release()
         self.assertEqual(file_obj.getvalue(), self._to_memcache(fixture_path('.gitconfig')).getvalue())

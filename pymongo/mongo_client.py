@@ -56,7 +56,7 @@ from pymongo.errors import (AutoReconnect,
                             InvalidOperation,
                             InvalidURI,
                             NetworkTimeout,
-                            NotMasterError,
+                            NotMainError,
                             OperationFailure)
 from pymongo.read_preferences import ReadPreference
 from pymongo.server_selectors import (writable_preferred_server_selector,
@@ -719,8 +719,8 @@ class MongoClient(common.BaseObject):
             # operation fails because of any network error besides a socket
             # timeout...."
             raise
-        except NotMasterError:
-            # "When the client sees a "not master" error it MUST replace the
+        except NotMainError:
+            # "When the client sees a "not main" error it MUST replace the
             # server's description with type Unknown. It MUST request an
             # immediate check of the server."
             self._reset_server_and_request_check(server.description.address)
@@ -738,7 +738,7 @@ class MongoClient(common.BaseObject):
     def _socket_for_reads(self, read_preference):
         preference = read_preference or ReadPreference.PRIMARY
         # Get a socket for a server matching the read preference, and yield
-        # sock_info, slave_ok. Server Selection Spec: "slaveOK must be sent to
+        # sock_info, subordinate_ok. Server Selection Spec: "subordinateOK must be sent to
         # mongods with topology type Single. If the server type is Mongos,
         # follow the rules for passing read preference to mongos, even for
         # topology type Single."
@@ -746,9 +746,9 @@ class MongoClient(common.BaseObject):
         topology = self._get_topology()
         single = topology.description.topology_type == TOPOLOGY_TYPE.Single
         with self._get_socket(read_preference) as sock_info:
-            slave_ok = (single and not sock_info.is_mongos) or (
+            subordinate_ok = (single and not sock_info.is_mongos) or (
                 preference != ReadPreference.PRIMARY)
-            yield sock_info, slave_ok
+            yield sock_info, subordinate_ok
 
     def _send_message_with_response(self, operation, read_preference=None,
                                     exhaust=False, address=None):
@@ -776,11 +776,11 @@ class MongoClient(common.BaseObject):
             selector = read_preference or writable_server_selector
             server = topology.select_server(selector)
 
-        # A _Query's slaveOk bit is already set for queries with non-primary
+        # A _Query's subordinateOk bit is already set for queries with non-primary
         # read preference. If this is a direct connection to a mongod, override
-        # and *always* set the slaveOk bit. See bullet point 2 in
+        # and *always* set the subordinateOk bit. See bullet point 2 in
         # server-selection.rst#topology-type-single.
-        set_slave_ok = (
+        set_subordinate_ok = (
             topology.description.topology_type == TOPOLOGY_TYPE.Single
             and server.description.server_type != SERVER_TYPE.Mongos)
 
@@ -788,7 +788,7 @@ class MongoClient(common.BaseObject):
             server,
             server.send_message_with_response,
             operation,
-            set_slave_ok,
+            set_subordinate_ok,
             self.__all_credentials,
             self._event_listeners,
             exhaust)

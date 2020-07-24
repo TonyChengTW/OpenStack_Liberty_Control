@@ -134,7 +134,7 @@ class TopologyDescription(object):
                 if s.is_server_type_known]
 
 
-# If topology type is Unknown and we receive an ismaster response, what should
+# If topology type is Unknown and we receive an ismain response, what should
 # the new topology type be?
 _SERVER_TYPE_TO_TOPOLOGY_TYPE = {
     SERVER_TYPE.Mongos: TOPOLOGY_TYPE.Sharded,
@@ -151,9 +151,9 @@ def updated_topology_description(topology_description, server_description):
     :Parameters:
       - `topology_description`: the current TopologyDescription
       - `server_description`: a new ServerDescription that resulted from
-        an ismaster call
+        an ismain call
 
-    Called after attempting (successfully or not) to call ismaster on the
+    Called after attempting (successfully or not) to call ismain on the
     server at server_description.address. Does not modify topology_description.
     """
     address = server_description.address
@@ -234,7 +234,7 @@ def _update_rs_from_primary(
         replica_set_name,
         server_description,
         max_election_id):
-    """Update topology description from a primary's ismaster response.
+    """Update topology description from a primary's ismain response.
 
     Pass in a dict of ServerDescriptions, current replica set name, the
     ServerDescription we are processing, and the TopologyDescription's

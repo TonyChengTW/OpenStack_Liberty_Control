@@ -376,7 +376,7 @@ class Database(common.BaseObject):
             son = manipulator.transform_outgoing(son, collection)
         return son
 
-    def _command(self, sock_info, command, slave_ok=False, value=1, check=True,
+    def _command(self, sock_info, command, subordinate_ok=False, value=1, check=True,
                  allowable_errors=None, read_preference=ReadPreference.PRIMARY,
                  codec_options=DEFAULT_CODEC_OPTIONS, **kwargs):
         """Internal command helper."""
@@ -386,7 +386,7 @@ class Database(common.BaseObject):
 
         return sock_info.command(self.__name,
                                  command,
-                                 slave_ok,
+                                 subordinate_ok,
                                  read_preference,
                                  codec_options,
                                  check,
@@ -475,12 +475,12 @@ class Database(common.BaseObject):
         .. mongodoc:: commands
         """
         client = self.__client
-        with client._socket_for_reads(read_preference) as (sock_info, slave_ok):
-            return self._command(sock_info, command, slave_ok, value,
+        with client._socket_for_reads(read_preference) as (sock_info, subordinate_ok):
+            return self._command(sock_info, command, subordinate_ok, value,
                                  check, allowable_errors, read_preference,
                                  codec_options, **kwargs)
 
-    def _list_collections(self, sock_info, slave_okay, criteria=None):
+    def _list_collections(self, sock_info, subordinate_okay, criteria=None):
         """Internal listCollections helper."""
         criteria = criteria or {}
         cmd = SON([("listCollections", 1), ("cursor", {})])
@@ -489,12 +489,12 @@ class Database(common.BaseObject):
 
         if sock_info.max_wire_version > 2:
             coll = self["$cmd"]
-            cursor = self._command(sock_info, cmd, slave_okay)["cursor"]
+            cursor = self._command(sock_info, cmd, subordinate_okay)["cursor"]
             return CommandCursor(coll, cursor, sock_info.address)
         else:
             coll = self["system.namespaces"]
             res = _first_batch(sock_info, coll.database.name, coll.name,
-                               criteria, 0, slave_okay,
+                               criteria, 0, subordinate_okay,
                                CodecOptions(), ReadPreference.PRIMARY, cmd,
                                self.client._event_listeners)
             data = res["data"]
@@ -514,10 +514,10 @@ class Database(common.BaseObject):
             will not include system collections (e.g ``system.indexes``)
         """
         with self.__client._socket_for_reads(
-                ReadPreference.PRIMARY) as (sock_info, slave_okay):
+                ReadPreference.PRIMARY) as (sock_info, subordinate_okay):
 
             wire_version = sock_info.max_wire_version
-            results = self._list_collections(sock_info, slave_okay)
+            results = self._list_collections(sock_info, subordinate_okay)
 
         # Iterating the cursor to completion may require a socket for getmore.
         # Ensure we do that outside the "with" block so we don't require more
@@ -706,7 +706,7 @@ class Database(common.BaseObject):
         error_msg = error.get("err", "")
         if error_msg is None:
             return None
-        if error_msg.startswith("not master"):
+        if error_msg.startswith("not main"):
             # Reset primary server and request check, if another thread isn't
             # doing so already.
             primary = self.__client.primary

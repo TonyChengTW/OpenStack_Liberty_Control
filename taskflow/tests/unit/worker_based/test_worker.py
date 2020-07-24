@@ -41,21 +41,21 @@ class TestWorker(test.MockTestCase):
         self.server_mock, self.server_inst_mock = self.patchClass(
             worker.server, 'Server')
 
-    def worker(self, reset_master_mock=False, **kwargs):
+    def worker(self, reset_main_mock=False, **kwargs):
         worker_kwargs = dict(exchange=self.exchange,
                              topic=self.topic,
                              tasks=[],
                              url=self.broker_url)
         worker_kwargs.update(kwargs)
         w = worker.Worker(**worker_kwargs)
-        if reset_master_mock:
-            self.resetMasterMock()
+        if reset_main_mock:
+            self.resetMainMock()
         return w
 
     def test_creation(self):
         self.worker()
 
-        master_mock_calls = [
+        main_mock_calls = [
             mock.call.executor_class(max_workers=None),
             mock.call.Server(self.topic, self.exchange,
                              self.executor_inst_mock, [],
@@ -64,7 +64,7 @@ class TestWorker(test.MockTestCase):
                              transport=mock.ANY,
                              retry_options=mock.ANY)
         ]
-        self.assertEqual(master_mock_calls, self.master_mock.mock_calls)
+        self.assertEqual(main_mock_calls, self.main_mock.mock_calls)
 
     def test_banner_writing(self):
         buf = six.StringIO()
@@ -77,7 +77,7 @@ class TestWorker(test.MockTestCase):
     def test_creation_with_custom_threads_count(self):
         self.worker(threads_count=10)
 
-        master_mock_calls = [
+        main_mock_calls = [
             mock.call.executor_class(max_workers=10),
             mock.call.Server(self.topic, self.exchange,
                              self.executor_inst_mock, [],
@@ -86,67 +86,67 @@ class TestWorker(test.MockTestCase):
                              transport=mock.ANY,
                              retry_options=mock.ANY)
         ]
-        self.assertEqual(master_mock_calls, self.master_mock.mock_calls)
+        self.assertEqual(main_mock_calls, self.main_mock.mock_calls)
 
     def test_creation_with_custom_executor(self):
         executor_mock = mock.MagicMock(name='executor')
         self.worker(executor=executor_mock)
 
-        master_mock_calls = [
+        main_mock_calls = [
             mock.call.Server(self.topic, self.exchange, executor_mock, [],
                              url=self.broker_url,
                              transport_options=mock.ANY,
                              transport=mock.ANY,
                              retry_options=mock.ANY)
         ]
-        self.assertEqual(master_mock_calls, self.master_mock.mock_calls)
+        self.assertEqual(main_mock_calls, self.main_mock.mock_calls)
 
     def test_run_with_no_tasks(self):
-        self.worker(reset_master_mock=True).run()
+        self.worker(reset_main_mock=True).run()
 
-        master_mock_calls = [
+        main_mock_calls = [
             mock.call.server.start()
         ]
-        self.assertEqual(master_mock_calls, self.master_mock.mock_calls)
+        self.assertEqual(main_mock_calls, self.main_mock.mock_calls)
 
     def test_run_with_tasks(self):
-        self.worker(reset_master_mock=True,
+        self.worker(reset_main_mock=True,
                     tasks=['taskflow.tests.utils:DummyTask']).run()
 
-        master_mock_calls = [
+        main_mock_calls = [
             mock.call.server.start()
         ]
-        self.assertEqual(master_mock_calls, self.master_mock.mock_calls)
+        self.assertEqual(main_mock_calls, self.main_mock.mock_calls)
 
     def test_run_with_custom_executor(self):
         executor_mock = mock.MagicMock(name='executor')
-        self.worker(reset_master_mock=True,
+        self.worker(reset_main_mock=True,
                     executor=executor_mock).run()
 
-        master_mock_calls = [
+        main_mock_calls = [
             mock.call.server.start()
         ]
-        self.assertEqual(master_mock_calls, self.master_mock.mock_calls)
+        self.assertEqual(main_mock_calls, self.main_mock.mock_calls)
 
     def test_wait(self):
-        w = self.worker(reset_master_mock=True)
+        w = self.worker(reset_main_mock=True)
         w.run()
         w.wait()
 
-        master_mock_calls = [
+        main_mock_calls = [
             mock.call.server.start(),
             mock.call.server.wait()
         ]
-        self.assertEqual(master_mock_calls, self.master_mock.mock_calls)
+        self.assertEqual(main_mock_calls, self.main_mock.mock_calls)
 
     def test_stop(self):
-        self.worker(reset_master_mock=True).stop()
+        self.worker(reset_main_mock=True).stop()
 
-        master_mock_calls = [
+        main_mock_calls = [
             mock.call.server.stop(),
             mock.call.executor.shutdown()
         ]
-        self.assertEqual(master_mock_calls, self.master_mock.mock_calls)
+        self.assertEqual(main_mock_calls, self.main_mock.mock_calls)
 
     def test_derive_endpoints_from_string_tasks(self):
         endpoints = worker.Worker._derive_endpoints(

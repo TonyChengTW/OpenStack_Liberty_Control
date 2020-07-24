@@ -31,13 +31,13 @@ except ImportError:
     _HAS_POLL = False
 
 from pymongo import helpers, message
-from pymongo.errors import AutoReconnect, NotMasterError, OperationFailure
+from pymongo.errors import AutoReconnect, NotMainError, OperationFailure
 from pymongo.read_concern import DEFAULT_READ_CONCERN
 
 _UNPACK_INT = struct.Struct("<i").unpack
 
 
-def command(sock, dbname, spec, slave_ok, is_mongos,
+def command(sock, dbname, spec, subordinate_ok, is_mongos,
             read_preference, codec_options, check=True,
             allowable_errors=None, address=None,
             check_keys=False, listeners=None, max_bson_size=None,
@@ -48,7 +48,7 @@ def command(sock, dbname, spec, slave_ok, is_mongos,
       - `sock`: a raw socket instance
       - `dbname`: name of the database on which to run the command
       - `spec`: a command document as a dict, SON, or mapping object
-      - `slave_ok`: whether to set the SlaveOkay wire protocol bit
+      - `subordinate_ok`: whether to set the SubordinateOkay wire protocol bit
       - `is_mongos`: are we connected to a mongos?
       - `read_preference`: a read preference
       - `codec_options`: a CodecOptions instance
@@ -62,7 +62,7 @@ def command(sock, dbname, spec, slave_ok, is_mongos,
     """
     name = next(iter(spec))
     ns = dbname + '.$cmd'
-    flags = 4 if slave_ok else 0
+    flags = 4 if subordinate_ok else 0
     # Publish the original command document.
     orig = spec
     if is_mongos:
@@ -101,7 +101,7 @@ def command(sock, dbname, spec, slave_ok, is_mongos,
     except Exception as exc:
         if publish:
             duration = (datetime.datetime.now() - start) + encoding_duration
-            if isinstance(exc, (NotMasterError, OperationFailure)):
+            if isinstance(exc, (NotMainError, OperationFailure)):
                 failure = exc.details
             else:
                 failure = message._convert_exception(exc)

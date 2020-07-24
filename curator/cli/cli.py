@@ -38,7 +38,7 @@ DEFAULT_ARGS = {
 @click.option('--ssl-no-validate', help='Do not validate SSL certificate', is_flag=True)
 @click.option('--http_auth', help='Use Basic Authentication ex: user:pass', default=DEFAULT_ARGS['http_auth'])
 @click.option('--timeout', help='Connection timeout in seconds.', default=DEFAULT_ARGS['timeout'], type=int)
-@click.option('--master-only', is_flag=True, help='Only operate on elected master node.')
+@click.option('--main-only', is_flag=True, help='Only operate on elected main node.')
 @click.option('--dry-run', is_flag=True, help='Do not perform any changes.', default=DEFAULT_ARGS['dry_run'])
 @click.option('--debug', is_flag=True, help='Debug mode', default=DEFAULT_ARGS['debug'])
 @click.option('--loglevel', help='Log level', default=DEFAULT_ARGS['log_level'])
@@ -46,7 +46,7 @@ DEFAULT_ARGS = {
 @click.option('--logformat', help='Log output format [default|logstash].', default=DEFAULT_ARGS['logformat'])
 @click.version_option(version=__version__)
 @click.pass_context
-def cli(ctx, host, url_prefix, port, use_ssl, certificate, ssl_no_validate, http_auth, timeout, master_only, dry_run, debug, loglevel, logfile, logformat):
+def cli(ctx, host, url_prefix, port, use_ssl, certificate, ssl_no_validate, http_auth, timeout, main_only, dry_run, debug, loglevel, logfile, logformat):
     """
     Curator for Elasticsearch indices.
 
